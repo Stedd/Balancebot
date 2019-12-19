@@ -35,7 +35,7 @@ void readIMU() {
     az = az_;
   }
 
-  acc_pitch = -1*atan2(sqrt(ay^2+az^2),ax);
+  acc_pitch = -1*atan2(ax,sqrt((pow(ay,2)+pow(az,2))))*180/3.14;
   
 
 //Serial plotter
@@ -44,13 +44,13 @@ void readIMU() {
 //  map(az,-140,140,-1,1)
 
   //    Serial.print  ( " x:" );
-  Serial.print  ( ax );
-  Serial.print  ( "," );
-  Serial.print  ( ay );
-  Serial.print  ( "," );
-  Serial.print  ( az );
-  Serial.print  ( "," );
-  Serial.println  ( acc_pitch*180/3.14 );
+//  Serial.print  ( ax );
+//  Serial.print  ( "," );
+//  Serial.print  ( ay );
+//  Serial.print  ( "," );
+//  Serial.print  ( az );
+//  Serial.print  ( "," );
+//  Serial.println  ( acc_pitch);
 
 
 

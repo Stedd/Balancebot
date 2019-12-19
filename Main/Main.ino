@@ -10,6 +10,7 @@ int   ax, ay, az;
 int   cx, cy, cz;
 float gx, gy, gz, gt;
 float acc_pitch;
+signed int speed_setp;
 
 int i, modifier;
 
@@ -41,8 +42,8 @@ void setup() {
   ledcAttachPin(m2_in1, 3);
   ledcAttachPin(m2_in2, 4);
 
-  ledcSetup(1, 12000, 12); // 12 kHz PWM, 8-bit resolution
-  ledcSetup(2, 12000, 12);
+  ledcSetup(1, 12000, 8); // 12 kHz PWM, 8-bit resolution
+  ledcSetup(2, 12000, 8);
   ledcSetup(3, 12000, 8);
   ledcSetup(4, 12000, 8);
 
