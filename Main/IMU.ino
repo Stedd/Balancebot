@@ -1,3 +1,11 @@
+//IMU variables
+
+int   ax_, ay_, az_;
+int   ax, ay, az;
+int   cx, cy, cz;
+float gx, gy, gz, gt;
+float acc_pitch;
+
 void readIMU() {
   ax_ = GY85.accelerometer_x( GY85.readFromAccelerometer() );
   ay_ = GY85.accelerometer_y( GY85.readFromAccelerometer() );
@@ -43,12 +51,12 @@ void readIMU() {
 //  map(ay,-140,140,-1,1)
 //  map(az,-140,140,-1,1)
 
-  //    Serial.print  ( " x:" );
+//      Serial.print  ( " x:" );
 //  Serial.print  ( ax );
 //  Serial.print  ( "," );
 //  Serial.print  ( ay );
 //  Serial.print  ( "," );
-//  Serial.print  ( az );
+//  Serial.println  ( az );
 //  Serial.print  ( "," );
 //  Serial.println  ( acc_pitch);
 

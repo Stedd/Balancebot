@@ -2,21 +2,10 @@
 #include "GY_85.h"
 #include <Wire.h>
 
-//System variables
-unsigned long now = micros();
-
-
-//IMU variables
 GY_85 GY85;     //create the object
-int   ax_, ay_, az_;
-int   ax, ay, az;
-int   cx, cy, cz;
-float gx, gy, gz, gt;
-float acc_pitch;
-signed int speed_setp;
 
-//Random
-int i, modifier;
+//System variables
+unsigned long tNow = micros();
 
 //Motor Control variables
 const byte m1_in1 = 18;
@@ -25,7 +14,7 @@ const byte m1_in2 = 19;
 //int m2_in2 = 17;
 
 //Encoders variables
-long int m1Raw, m1RawLast;
+long int m1Raw,m1RawLast;
 const byte pin_m1_A = 34;
 const byte pin_m1_B = 35;
 volatile bool A_state;
@@ -124,20 +113,19 @@ void setup() {
   //  ledcSetup(3, 12000, 8);
   //  ledcSetup(4, 12000, 8);
 
-  //Random
-  i = 0;
-  modifier = 2;
+Serial.println("Reference,Actual,SpeedCommand");
+
 }
 
 void loop() {
   //Update system variables
-  now = micros();
+  tNow = micros();
 
-  //Only print encoder value if value changed since last print
-  if (m1Raw != m1RawLast) {
-    Serial.println(m1Raw);
-    m1RawLast = m1Raw;
-  }
+////  //Only print encoder value if value changed since last print
+//  if (m1Raw != m1RawLast) {
+//    Serial.println(m1Raw);
+//    m1RawLast = m1Raw;
+//  }
 
   //Sense
   readIMU();
