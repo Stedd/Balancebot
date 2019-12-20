@@ -1,5 +1,4 @@
 //IMU variables
-
 int   ax_, ay_, az_;
 int   ax, ay, az;
 int   cx, cy, cz;
@@ -7,18 +6,18 @@ float gx, gy, gz, gt;
 float acc_pitch;
 
 void readIMU() {
-  ax_ = GY85.accelerometer_x( GY85.readFromAccelerometer() );
-  ay_ = GY85.accelerometer_y( GY85.readFromAccelerometer() );
-  az_ = GY85.accelerometer_z( GY85.readFromAccelerometer() );
+  ax_ = IMU.accelerometer_x( IMU.readFromAccelerometer() );
+  ay_ = IMU.accelerometer_y( IMU.readFromAccelerometer() );
+  az_ = IMU.accelerometer_z( IMU.readFromAccelerometer() );
 
-  //  cx = GY85.compass_x( GY85.readFromCompass() );
-  //  cy = GY85.compass_y( GY85.readFromCompass() );
-  //  cz = GY85.compass_z( GY85.readFromCompass() );
+  //  cx = IMU.compass_x( IMU.readFromCompass() );
+  //  cy = IMU.compass_y( IMU.readFromCompass() );
+  //  cz = IMU.compass_z( IMU.readFromCompass() );
 
-  gx = GY85.gyro_x( GY85.readGyro() );
-  gy = GY85.gyro_y( GY85.readGyro() );
-  gz = GY85.gyro_z( GY85.readGyro() );
-  //  gt = GY85.temp  ( GY85.readGyro() );
+  gx = IMU.gyro_x( IMU.readGyro() );
+  gy = IMU.gyro_y( IMU.readGyro() );
+  gz = IMU.gyro_z( IMU.readGyro() );
+  //  gt = IMU.temp  ( IMU.readGyro() );
 
 
   //For some reason the ints in the example behaves as unsigned int.. Maybe look at the .cpp code, might be something there, if not. This works OK.
