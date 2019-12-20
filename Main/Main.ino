@@ -8,14 +8,14 @@ GY_85 IMU;
 
 
 //GPIO PIN MAPPING
-const byte    M1_ENC_A      = 34;
-const byte    M1_ENC_B      = 35;
-const byte    M2_ENC_A      = 32;
-const byte    M2_ENC_B      = 33;
-const byte    M1_A          = 18;
-const byte    M1_B          = 19;
-const byte    M2_A          = 16;
-const byte    M2_B          = 17;
+const byte    M1_ENC_A      = 32;
+const byte    M1_ENC_B      = 33;
+const byte    M2_ENC_A      = 34;
+const byte    M2_ENC_B      = 35;
+const byte    M1_A          = 16;
+const byte    M1_B          = 17;
+const byte    M2_A          = 18;
+const byte    M2_B          = 19;
 const byte    IMU_I2C_SCL   = 26;
 const byte    IMU_I2C_SDA   = 27;
 
@@ -102,20 +102,20 @@ void IRAM_ATTR m2_A_changed() {
   //Rising
   if (M2_A_state == HIGH) {
     if (M2_B_state == HIGH) {
-      m2Raw = m2Raw - 1;
+      m2Raw = m2Raw + 1;
     }
     else if (M2_B_state == LOW) {
-      m2Raw = m2Raw + 1;
+      m2Raw = m2Raw - 1;
     }
   }
 
   //Falling
   else if (M2_A_state == LOW) {
     if (M2_B_state == HIGH) {
-      m2Raw = m2Raw + 1;
+      m2Raw = m2Raw - 1;
     }
     else if (M2_B_state == LOW) {
-      m2Raw = m2Raw - 1;
+      m2Raw = m2Raw + 1;
     }
   }
 }
@@ -128,20 +128,20 @@ void IRAM_ATTR m2_B_changed() {
   //Rising
   if (M2_B_state == HIGH) {
     if (M2_A_state == HIGH) {
-      m2Raw = m2Raw + 1;
+      m2Raw = m2Raw - 1;
     }
     else if (M2_A_state == LOW) {
-      m2Raw = m2Raw - 1;
+      m2Raw = m2Raw + 1;
     }
   }
 
   //Falling
   else if (M2_B_state == LOW) {
     if (M2_A_state == HIGH) {
-      m2Raw = m2Raw - 1;
+      m2Raw = m2Raw + 1;
     }
     else if (M2_A_state == LOW) {
-      m2Raw = m2Raw + 1;
+      m2Raw = m2Raw - 1;
     }
   }
 }
@@ -191,8 +191,6 @@ void setup() {
   ledcSetup(2, PWM_CYCLE, PWM_RESOLUTION);
   ledcSetup(3, PWM_CYCLE, PWM_RESOLUTION);
   ledcSetup(4, PWM_CYCLE, PWM_RESOLUTION);
-
-  //  Serial.println("Reference,Actual,SpeedCommand");
 
 }
 
