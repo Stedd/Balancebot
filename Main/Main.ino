@@ -1,3 +1,5 @@
+#include <GY_85.h>
+
 //Import
 #include "GY_85.h"
 #include <Wire.h>
@@ -22,6 +24,8 @@ const byte  IMU_I2C_SDA     = 27;
 
 //System variables
 unsigned long tNow          = micros();
+unsigned long tLast         = micros()+13000;
+int           dT            = 0;
 
 
 //Motor variables
@@ -156,6 +160,8 @@ void setup() {
 
   //Initialize IMU
   IMU.init();
+  //Might need some logic here to mke sure the gyro is calibrated correctly, or hardcode the values...
+  IMU.GyroCalibrate();
   delay(10);
 
   //Initialize encoder interrupts
@@ -188,13 +194,14 @@ void setup() {
   ledcSetup(3, PWM_CYCLE, PWM_RESOLUTION);
   ledcSetup(4, PWM_CYCLE, PWM_RESOLUTION);
 
-  Serial.println("Reference,Actual,SpeedCommand");
+//  Serial.println("Reference,Actual,SpeedCommand");
 
 }
 
 void loop() {
   //Update system variables
-  tNow = micros();
+  tNow  = micros();
+  dT    = tNow - tLast;             //[Cycle time in microseconds]
 
   ////  //Only print encoder value if value changed since last print
   //  if (m1Raw != m1RawLast) {
@@ -212,7 +219,7 @@ void loop() {
   //Act
   motorControl();
 
-
+  tLast = tNow;
   //Delay
   delay(5);             // only read every 0,5 seconds, 10ms for 100Hz, 20ms for 50Hz
 }
