@@ -33,28 +33,10 @@ void readIMU() {
   //  gt = IMU.temp  ( IMU.readGyro() );
 
 
-  //For some reason the ints in the example behaves as unsigned int.. Maybe look at the .cpp code, might be something there, if not. This works OK.
   //Convert accelerometer
-  if (ax_ > 32768) {
-    ax = (ax_ - acc_overflow_value);
-  }
-  else  {
-    ax = ax_;
-  }
-
-  if (ay_ > 32768) {
-    ay = (ay_ - acc_overflow_value);
-  }
-  else  {
-    ay = ay_;
-  }
-
-  if (az_ > 32768) {
-    az = (az_ - acc_overflow_value);
-  }
-  else  {
-    az = az_;
-  }
+  ax = convertInt(ax_, acc_overflow_value);
+  ay = convertInt(ay_, acc_overflow_value);
+  az = convertInt(az_, acc_overflow_value);
 
 
   //Convert gyro
@@ -62,30 +44,11 @@ void readIMU() {
   //  gx -  Pitch rate
   //  gy -  Roll rate
   //  gz -  Yaw rate
-
   //  Gyro is calibrated for +-2000deg/s
   //  Conversion is happening in GY_85.h line 48-50
-
-  if (gx_ > 2279) {
-    gx = (gx_ - gyro_overflow_value);
-  }
-  else  {
-    gx = gx_;
-  }
-
-  if (gy_ > 2279) {
-    gy = (gy_ - gyro_overflow_value);
-  }
-  else  {
-    gy = gy_;
-  }
-
-  if (gz_ > 2279) {
-    gz = (gz_ - gyro_overflow_value);
-  }
-  else  {
-    gz = gz_;
-  }
+  gx = convertInt(gx_, gyro_overflow_value);
+  gy = convertInt(gy_, gyro_overflow_value);
+  gz = convertInt(gz_, gyro_overflow_value);
 
 
   // Pitch angle from accelerometer
@@ -103,16 +66,33 @@ void readIMU() {
 
 
   //Serial plotter
-//  Serial.print  ( "Pitch:" );
-//  Serial.print  ( pitch );
-//  Serial.print  (" ");
-//  Serial.print  ( "Accelerometer_Pitch:" );
-//  Serial.print  ( acc_pitch );
-//  Serial.print  (" ");
+  //  Serial.print  ( "Pitch:" );
+  //  Serial.print  ( pitch );
+  //  Serial.print  (" ");
+  //  Serial.print  ( "Accelerometer_Pitch:" );
+  //  Serial.print  ( acc_pitch );
+  //  Serial.print  (" ");
   //  Serial.print  ( "," );
   //  Serial.println  ( gz );
   //  Serial.print  ( "," );
   //  Serial.println  ( gt );
   //  Serial.print  ( "," );
   //  Serial.println  ( acc_pitch);
+}
+
+
+int convertInt(int raw, int overflow_value_) {
+  //For some reason the ints in the example behaves as unsigned int.. Maybe look at the .cpp code, might be something there, if not. This works OK.
+  int conv_val;
+
+  if (raw > (overflow_value_ / 2)) {
+    conv_val = (raw - overflow_value_);
+  }
+
+  else  {
+    conv_val = raw;
+  }
+
+  return conv_val;
+
 }

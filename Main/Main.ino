@@ -1,7 +1,5 @@
-#include <GY_85.h>
-
 //Import
-#include "GY_85.h"
+#include <GY_85.h>
 #include <Wire.h>
 
 
@@ -10,21 +8,21 @@ GY_85 IMU;
 
 
 //GPIO PIN MAPPING
-const byte  M1_ENC_A        = 34;
-const byte  M1_ENC_B        = 35;
-const byte  M2_ENC_A        = 32;
-const byte  M2_ENC_B        = 33;
-const byte  M1_A            = 18;
-const byte  M1_B            = 19;
-const byte  M2_A            = 16;
-const byte  M2_B            = 17;
-const byte  IMU_I2C_SCL     = 26;
-const byte  IMU_I2C_SDA     = 27;
+const byte    M1_ENC_A      = 34;
+const byte    M1_ENC_B      = 35;
+const byte    M2_ENC_A      = 32;
+const byte    M2_ENC_B      = 33;
+const byte    M1_A          = 18;
+const byte    M1_B          = 19;
+const byte    M2_A          = 16;
+const byte    M2_B          = 17;
+const byte    IMU_I2C_SCL   = 26;
+const byte    IMU_I2C_SDA   = 27;
 
 
-//System variables
+//Time variables
 unsigned long tNow          = micros();
-unsigned long tLast         = micros()+13000;
+unsigned long tLast         = micros() + 13000;
 int           dT            = 0;
 
 
@@ -194,32 +192,28 @@ void setup() {
   ledcSetup(3, PWM_CYCLE, PWM_RESOLUTION);
   ledcSetup(4, PWM_CYCLE, PWM_RESOLUTION);
 
-//  Serial.println("Reference,Actual,SpeedCommand");
+  //  Serial.println("Reference,Actual,SpeedCommand");
 
 }
 
 void loop() {
-  //Update system variables
+  //Update time variables
   tNow  = micros();
   dT    = tNow - tLast;             //[Cycle time in microseconds]
 
-  ////  //Only print encoder value if value changed since last print
-  //  if (m1Raw != m1RawLast) {
-  //    Serial.println(m1Raw);
-  //    m1RawLast = m1Raw;
-  //  }
 
-  //Sense
+  //Get sensor data
   readIMU();
 
 
-  //Think
+  //Control motor
+  motors();
 
 
-  //Act
-  motorControl();
-
+  //Save time
   tLast = tNow;
+
+
   //Delay
   delay(5);             // only read every 0,5 seconds, 10ms for 100Hz, 20ms for 50Hz
 }

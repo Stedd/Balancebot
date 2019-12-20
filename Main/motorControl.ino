@@ -1,100 +1,99 @@
 //Constants
-const float   wheel_diameter  = 0.067708;
-const float   pulses_per_turn = 1320.0;
-const float   filt_gain = 15;
+const int     MOTOR_SATURATION  = round(pow(2, PWM_RESOLUTION));
+const float   WHEEL_DIAMETER    = 0.067708;
+const float   PULSES_PER_TURN   = 1320.0;
+
 //Tuning
-const float   K = 3.5;
-const float   I = 7.5;
+const float   K                 = 3.5;
+const float   I                 = 7.5;
+const float   filter_gain       = 15;
 
 //Help variables
-int           dEnc;
-float         dTurn, ang_vel, lin_vel, lin_vel_prev, ang_vel_filtered, lin_vel_filtered;
-float         dVel, diff;
+float         M1_Lin_Vel, M2_Lin_Vel;
+int           M1_Speed_CMD, M2_Speed_CMD;
+float         M1_iError, M2_iError;
 
-float         speed_setp, referenceSpeed, actualSpeed, actualSpeedFiltered;
-float         error, iError;
-int           speedCMD;
+float         ref, act, error;
 
+void motors() {
 
-void motorControl() {
+  //Controllers
+  ref             = pitch * ((4096.0) / (90.0));
+  act             = M1_Lin_Vel * 4096.0;
+  error           = ref - act;
+  M1_iError       = M1_iError + (error * dT * pow(10, -6) * I);
+  M1_Speed_CMD    = round((error * K) + M1_iError);
 
-  //Speed Controller
-  referenceSpeed  = pitch * ((4096.0) / (90.0));
-  actualSpeed     = lin_vel * 4096.0;
-  actualSpeedFiltered = lin_vel_filtered * 4096.0;
-  error           = referenceSpeed - actualSpeedFiltered;
-  iError          = iError + (error * dT * pow(10, -6) * I);
-  speedCMD        = round((error * K) + iError);
-
-
-  // Speed command saturation
-  if (speedCMD > 4096) {
-    speedCMD = 4096;
-  }
-  else if (speedCMD < -4096) {
-    speedCMD = -4096;
-  }
-  else {
-    speedCMD = speedCMD;
-  }
+//  ref             = pitch * ((4096.0) / (90.0));
+//  act             = M2_Lin_Vel * 4096.0;
+//  error           = ref - act;
+//  M2_iError       = M2_iError + (error * dT * pow(10, -6) * I);
+//  M2_Speed_CMD    = round((error * K) + M2_iError);
 
 
-  //Motor 1 Control
-  if (speedCMD > 0) {
-    ledcWrite(1, 0);
-    ledcWrite(2, speedCMD);
-  }
-  else if (speedCMD < 0) {
-    ledcWrite(1, -1 * speedCMD);
-    ledcWrite(2, 0);
-  }
-
-
-
-  //Motor 2
-  //  ledcWrite(3, 255);
-  //  ledcWrite(4, 255);
-
-
-  //No speed command
-  //  ledcWrite(1, 0);
-  //  ledcWrite(2, 0);
-  ledcWrite(3, 0);
-  ledcWrite(4, 0);
 
 
   //Calculate speed from encoders
-  dEnc    = m1Raw - m1RawLast;        //[Number of encoder pulses this cycle]
+  M1_Lin_Vel = encoderReader(m1Raw, m1RawLast, M1_Lin_Vel, PULSES_PER_TURN, WHEEL_DIAMETER, dT, filter_gain);
+  //  M2_Lin_Vel = encoderReader(m2Raw, m2RawLast, M2_Lin_Vel, PULSES_PER_TURN, WHEEL_DIAMETER, dT, filter_gain);
 
-  dTurn   = dEnc / pulses_per_turn;   //[Amount wheel turned this cycle. 1 = full rotation]
 
-  ang_vel = (dTurn * 2 * PI) / (dT * 0.000001);
-  lin_vel = (dTurn * wheel_diameter * PI) / (dT * 0.000001);
+  //Motor 1
+  motorControl(1, M1_Speed_CMD, MOTOR_SATURATION);
 
-  //  Lowpass filter
-  //  lin_vel_filtered        = lin_vel_filtered + ((lin_vel - lin_vel_filtered)*(1-abs(diff))* dT * pow(10, -6)*filt_gain);
-  lin_vel_filtered        = lin_vel_filtered + ((lin_vel - lin_vel_filtered) * dT * pow(10, -6) * filt_gain);
+  //Motor 2
+//  motorSpeed(2, M2_Speed_CMD, MOTOR_SATURATION);
+  motorControl(2, 0, MOTOR_SATURATION);
 
 
   //  Serial plotter
-  Serial.print("referenceSpeed:");
-  Serial.print(referenceSpeed * (100.0 / 4096.0));
+  Serial.print("M1_Speed_REF:");
+  Serial.print(ref * (100.0 / 4096.0));
   Serial.print(" ");
-//  Serial.print("actualSpeed:");
-//  Serial.print(actualSpeed * (100.0 / 4096.0));
-//  Serial.print(" ");
-  Serial.print("actualSpeedFiltered:");
-  Serial.print(actualSpeedFiltered * (100.0 / 4096.0));
+  Serial.print("M1_Speed_ACT:");
+  Serial.print(act * (100.0 / 4096.0));
   Serial.print(" ");
-  Serial.print("speedCMD:");
-  Serial.println(speedCMD * (100.0 / 4096.0));
-  //    Serial.print  ( "," );
-  //  Serial.println(lin_vel);
-  //  Serial.print  ( "," );
+  Serial.print("M1_Speed_CMD:");
+  Serial.println(M1_Speed_CMD * (100.0 / 4096.0));
 
 
   //Update variables for next scan cycle
   m1RawLast = m1Raw;
+  m2RawLast = m2Raw;
+}
+
+float encoderReader(int encRaw, int encRawLast, float lin_vel_filtered_, float pulses_per_turn_, float wheel_diameter_, int dT_, float filt_gain_ ) {
+  float dEnc_    = encRaw - encRawLast;        //[Number of encoder pulses this cycle]
+  float dTurn_   = dEnc_ / pulses_per_turn_;   //[Amount wheel turned this cycle. 1 = full rotation]
+  float lin_vel_ = (dTurn_ * wheel_diameter_ * PI) / (dT_ * 0.000001);
+  return lin_vel_filtered_ + ((lin_vel_ - lin_vel_filtered_) * dT_ * 0.000001 * filt_gain_);
+}
+
+void motorControl(byte motorID, int speedCMD_, int saturation) {
+  //Calculate channel
+  byte ch1 = motorID * 2 - 1;
+  byte ch2 = motorID * 2;
 
 
+  // Speed command saturation
+  if (speedCMD_ > saturation) {
+    speedCMD_ = saturation;
+  }
+  else if (speedCMD_ < -saturation) {
+    speedCMD_ = -saturation;
+  }
+  else {
+    speedCMD_ = speedCMD_;
+  }
+
+
+  //Motor Control
+  if (speedCMD_ > 0) {
+    ledcWrite(ch1, 0);
+    ledcWrite(ch2, speedCMD_);
+  }
+  else if (speedCMD_ < 0) {
+    ledcWrite(ch1, -1 * speedCMD_);
+    ledcWrite(ch2, 0);
+  }
 }
