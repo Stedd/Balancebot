@@ -5,12 +5,10 @@ const int     gyro_overflow_value = 4558;   // 4096+512-50=4558 ?
 
 
 //IMU VARIABLES
-int           ax_, ay_, az_;
 int           ax, ay, az;
-int           cx_, cy_, cz_;
-int           gx_, gy_, gz_;
+int           cx, cy, cz;
 int           gx, gy, gz;
-//float gt;
+float         gt;
 float         acc_pitch;
 float         pitch_rate;
 float         dAngle, estAngle;
@@ -19,36 +17,32 @@ float         pitch_prev          = 0;
 
 
 void readIMU() {
-  ax_ = IMU.accelerometer_x( IMU.readFromAccelerometer() );
-  ay_ = IMU.accelerometer_y( IMU.readFromAccelerometer() );
-  az_ = IMU.accelerometer_z( IMU.readFromAccelerometer() );
-
-  //  cx = IMU.compass_x( IMU.readFromCompass() );
-  //  cy = IMU.compass_y( IMU.readFromCompass() );
-  //  cz = IMU.compass_z( IMU.readFromCompass() );
-
-  gx_ = IMU.gyro_x( IMU.readGyro() );
-  gy_ = IMU.gyro_y( IMU.readGyro() );
-  gz_ = IMU.gyro_z( IMU.readGyro() );
-  //  gt = IMU.temp  ( IMU.readGyro() );
+  //Acceletometer
+  ax  = convertInt(IMU.accelerometer_x( IMU.readFromAccelerometer() ), acc_overflow_value);
+  ay  = convertInt(IMU.accelerometer_y( IMU.readFromAccelerometer() ), acc_overflow_value);
+  az  = convertInt(IMU.accelerometer_z( IMU.readFromAccelerometer() ), acc_overflow_value);
 
 
-  //Convert accelerometer
-  ax = convertInt(ax_, acc_overflow_value);
-  ay = convertInt(ay_, acc_overflow_value);
-  az = convertInt(az_, acc_overflow_value);
+  //Magnetometer
+  cx = IMU.compass_x( IMU.readFromCompass() );
+  cy = IMU.compass_y( IMU.readFromCompass() );
+  cz = IMU.compass_z( IMU.readFromCompass() );
 
 
-  //Convert gyro
-  //  Gyroscope coordinate system
+  //  Gyrocope
+  //  Coordinate system
   //  gx -  Pitch rate
   //  gy -  Roll rate
   //  gz -  Yaw rate
   //  Gyro is calibrated for +-2000deg/s
   //  Conversion is happening in GY_85.h line 48-50
-  gx = convertInt(gx_, gyro_overflow_value);
-  gy = convertInt(gy_, gyro_overflow_value);
-  gz = convertInt(gz_, gyro_overflow_value);
+  gx  = convertInt(IMU.gyro_x( IMU.readGyro() ), gyro_overflow_value);
+  gy  = convertInt(IMU.gyro_y( IMU.readGyro() ), gyro_overflow_value);
+  gz  = convertInt(IMU.gyro_z( IMU.readGyro() ), gyro_overflow_value);
+
+
+  //Temperature sensor
+  gt = IMU.temp  ( IMU.readGyro() );
 
 
   // Pitch angle from accelerometer
@@ -83,16 +77,12 @@ void readIMU() {
 
 int convertInt(int raw, int overflow_value_) {
   //For some reason the ints in the example behaves as unsigned int.. Maybe look at the .cpp code, might be something there, if not. This works OK.
-  int conv_val;
 
   if (raw > (overflow_value_ / 2)) {
-    conv_val = (raw - overflow_value_);
+    return (raw - overflow_value_);
   }
 
   else  {
-    conv_val = raw;
+    return raw;
   }
-
-  return conv_val;
-
 }
