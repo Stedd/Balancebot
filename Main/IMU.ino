@@ -54,7 +54,7 @@ void readIMU() {
 
 
   //Complementary filter
-  dAngle      = pitch_rate * dT * pow(10, -6);
+  dAngle      = pitch_rate * dT_s;
   pitch       = acc_pitch * (1 - alpha) + (dAngle + pitch_prev * alpha);
   pitch_prev  = pitch;
 
