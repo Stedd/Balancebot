@@ -1,6 +1,7 @@
 //Import
 #include <GY_85.h>
 #include <Wire.h>
+#include <MatrixMath.h>
 
 
 //Declare library objects
@@ -24,19 +25,25 @@ const byte    IMU_I2C_SDA   = 27;
 unsigned long tNow          = micros();
 unsigned long tLast         = micros() + 13000;
 int           dT            = 0;
+float         dT_s          = 0.0;
 
 
 //Motor variables
 const int   PWM_CYCLE       = 12000;
 const byte  PWM_RESOLUTION  = 12;
 
+
 //Encoders variables
 long int        m1Raw, m1RawLast;
 long int        m2Raw, m2RawLast;
-volatile bool   M1_A_state;
-volatile bool   M1_B_state;
-volatile bool   M2_A_state;
-volatile bool   M2_B_state;
+volatile bool   M1_A_state, M1_B_state;
+volatile bool   M2_A_state, M2_B_state;
+
+
+//Matrices
+mtx_type      motor_ang_vel     [2][1];
+mtx_type      vel_Matrix        [2][1];
+mtx_type      inv_Kin           [2][2];
 
 
 //Interrupt routines
@@ -192,12 +199,22 @@ void setup() {
   ledcSetup(3, PWM_CYCLE, PWM_RESOLUTION);
   ledcSetup(4, PWM_CYCLE, PWM_RESOLUTION);
 
+  //Initialize differential drive inverse kinematics
+  initMotors();
+
 }
 
 void loop() {
   //Update time variables
   tNow  = micros();
   dT    = tNow - tLast;             //[Cycle time in microseconds]
+  dT_s  = dT * pow(10,-6);          //[Cycle time in seconds]
+
+//  Serial.print("dT:");
+//  Serial.print(dT);
+//  Serial.print(" ");
+//  Serial.print("dT_s:");
+//  Serial.println(dT_s);
 
 
   //Get sensor data
