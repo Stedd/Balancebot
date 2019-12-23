@@ -5,6 +5,7 @@ const float   WHEEL_DIAMETER    = 0.0677;
 const float   PULSES_PER_TURN   = 1320.0;
 const float   BALANCE_POINT     = 0.05;
 const float   SPEED_REF         = 0.00;
+const float   TURN_SPEED_REF    = 0.00;
 const float   DEADBAND_M1_POS   = 90.0;
 const float   DEADBAND_M1_NEG   = 90.0;
 const float   DEADBAND_M2_POS   = 90.0;
@@ -85,39 +86,10 @@ void motors() {
   motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
 
 
-  //  Serial plotter
-  //  Serial.print("Balance_Point:");
-  //  Serial.print(ref_OL);
-  //  Serial.print(" ");
-  //  Serial.print("Pitch_Angle:");
-  //  Serial.print(act_OL);
-  //  Serial.print(" ");
-  //  Serial.print("Speed_CMD:");
-  //  Serial.println(Speed_CMD * (100.0 / 4096.0));
-
-
-  //  Serial.print("M1_Ang_Vel:");
-  //  Serial.print(M1_Ang_Vel);
-  //  Serial.print(" ");
-  //  Serial.print("M2_Ang_Vel:");
-  //  Serial.print(M2_Ang_Vel);
-  //  Serial.print(" ");
-  //  Serial.print("botLinVel:");
-  //  Serial.print(vel_Matrix[0][0]);
-  //  Serial.print(" ");
-  //  Serial.print("botAngVel:");
-  //  Serial.println(vel_Matrix[1][0]);
-
-
   //Update variables for next scan cycle
   m1RawLast = m1Raw;
   m2RawLast = m2Raw;
 
-  //  Serial.print("m1Raw:");
-  //  Serial.print(m1Raw);
-  //  Serial.print(" ");
-  //  Serial.print("m2Raw:");
-  //  Serial.println(m2Raw);
 
 }
 
@@ -137,9 +109,8 @@ float encoderReaderAngVel(int encRaw, int encRawLast, float ang_vel_filtered_, f
 
 void motorControl(byte motorID, int speedCMD_, int saturation, float dbPos_, float dbNeg_) {
   //Calculate channel
-  byte ch1 = motorID * 2 - 1;
   byte ch2 = motorID * 2;
-
+  byte ch1 = ch2 - 1;
 
   //Deadband
   if (speedCMD_ > 0 && speedCMD_ < dbPos_) {

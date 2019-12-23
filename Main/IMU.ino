@@ -30,15 +30,9 @@ void readIMU() {
 
 
   //  Gyrocope
-  //  Coordinate system
-  //  gx -  Pitch rate
-  //  gy -  Roll rate
-  //  gz -  Yaw rate
-  //  Gyro is calibrated for +-2000deg/s
-  //  Conversion is happening in GY_85.h line 48-50
-  gx  = convertInt(IMU.gyro_x( IMU.readGyro() ), gyro_overflow_value);
-  gy  = convertInt(IMU.gyro_y( IMU.readGyro() ), gyro_overflow_value);
-  gz  = convertInt(IMU.gyro_z( IMU.readGyro() ), gyro_overflow_value);
+  gx  = convertInt(IMU.gyro_x( IMU.readGyro() ), gyro_overflow_value);    //  gx -  Pitch rate
+  gy  = convertInt(IMU.gyro_y( IMU.readGyro() ), gyro_overflow_value);    //  gy -  Roll rate
+  gz  = convertInt(IMU.gyro_z( IMU.readGyro() ), gyro_overflow_value);    //  gz -  Yaw rate
 
 
   //Temperature sensor
@@ -58,20 +52,7 @@ void readIMU() {
   pitch       = acc_pitch * (1 - alpha) + ((dAngle + pitch_prev) * alpha);
   pitch_prev  = pitch;
 
-
-  //Serial plotter
-  //  Serial.print  ( "Pitch:" );
-  //  Serial.print  ( pitch );
-  //  Serial.print  (" ");
-  //  Serial.print  ( "Accelerometer_Pitch:" );
-  //  Serial.print  ( acc_pitch );
-  //  Serial.print  (" ");
-  //  Serial.print  ( "," );
-  //  Serial.println  ( gz );
-  //  Serial.print  ( "," );
-  //  Serial.println  ( gt );
-  //  Serial.print  ( "," );
-  //  Serial.println  ( acc_pitch);
+  
 }
 
 

@@ -5,7 +5,7 @@
 
 
 //Declare library objects
-GY_85 IMU;
+GY_85         IMU;
 
 
 //GPIO PIN MAPPING
@@ -41,16 +41,12 @@ volatile bool   M2_A_state, M2_B_state;
 
 
 //Matrices
-mtx_type      motor_ang_vel     [2][1];
-mtx_type      vel_Matrix        [2][1];
-mtx_type      inv_Kin           [2][2];
+mtx_type      motor_ang_vel   [2][1];
+mtx_type      vel_Matrix      [2][1];
+mtx_type      inv_Kin         [2][2];
 
 
 //Interrupt routines
-//  CW =  INCREASE
-//  CCW = DECREASE
-
-
 void IRAM_ATTR m1_A_changed() {
   M1_A_state = digitalRead(M1_ENC_A);
   M1_B_state = digitalRead(M1_ENC_B);
@@ -210,23 +206,20 @@ void loop() {
   dT    = tNow - tLast;             //[Cycle time in microseconds]
   dT_s  = dT * pow(10,-6);          //[Cycle time in seconds]
 
-//  Serial.print("dT:");
-//  Serial.print(dT);
-//  Serial.print(" ");
-//  Serial.print("dT_s:");
-//  Serial.println(dT_s);
-
 
   //Get sensor data
   readIMU();
 
 
-  //Control motor
+  //Control motors
   motors();
 
 
-  //Save time
+  //Save time for next cycle
   tLast = tNow;
+
+  //Plot
+  // plot();
 
 
   //Delay
