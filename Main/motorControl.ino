@@ -4,7 +4,7 @@ const float   BASE_WIDTH        = 0.1837;
 const float   WHEEL_DIAMETER    = 0.0677;
 const float   PULSES_PER_TURN   = 1320.0;
 const float   BALANCE_POINT     = 0.05;
-const float   SPEED_REFERENCE   = 0.0;
+const float   SPEED_REF         = 0.00;
 const float   DEADBAND_M1_POS   = 90.0;
 const float   DEADBAND_M1_NEG   = 90.0;
 const float   DEADBAND_M2_POS   = 90.0;
@@ -13,49 +13,42 @@ const float   DEADBAND_M2_NEG   = 90.0;
 
 //Tuning
 const float   K_SC              = 20.0;
+const float   K_TC              = 50.0;
 const float   K_OL              = 13.0;
-const float   K_IL              = 90.0;
-const float   I_IL              = 5.5;
-const float   filter_gain       = 15.0;
+const float   K_IL              = 85.0;
+const float   I_IL              = 5.25;
+const float   filter_gain       = 16.0;
 
 
 //Help variables
-float         M1_Lin_Vel, M2_Lin_Vel;
-float         M1_Ang_Vel, M2_Ang_Vel;
-float         botLinVel , botAngVel ;
-int           Speed_CMD, M1_Speed_CMD, M2_Speed_CMD;
+int           M1_Speed_CMD, M2_Speed_CMD;
 float         ref_SC, act_SC, error_SC, SC_cont_out;
+float         ref_TC, act_TC, error_TC, TC_cont_out;
 float         ref_OL, act_OL, error_OL, OL_cont_out;
-float         ref_IL, act_IL, error_IL, iError_IL;
-
-
+float         ref_IL, act_IL, error_IL, IL_cont_out, iError_IL;
 
 
 void initMotors() {
-  //  float temp[] = {WHEEL_DIAMETER / 4, WHEEL_DIAMETER / 4, (WHEEL_DIAMETER / 2) / BASE_WIDTH, -(WHEEL_DIAMETER / 2) / BASE_WIDTH};
-  //  int k = 0;
-  //  for (int i = 0; i < 2; i++)
-  //  {
-  //    for (int j = 0; j < 2; j++)
-  //    {
-  //      inv_Kin[i][j] = temp[k];
-  //      k = k + 1;
-  //    }
-  //  }
-
   inv_Kin[0][0] = WHEEL_DIAMETER / 4;
   inv_Kin[1][0] = (WHEEL_DIAMETER / 2) / BASE_WIDTH;
   inv_Kin[0][1] = WHEEL_DIAMETER / 4;
   inv_Kin[1][1] = -(WHEEL_DIAMETER / 2) / BASE_WIDTH;
-
-  Matrix.Print((mtx_type*)inv_Kin, 2, 2, "Inverse kinematic matrix");
 }
 
 void motors() {
 
 
+  //Calculate wheel angular velocity
+  motor_ang_vel[0][0] = encoderReaderAngVel(m1Raw, m1RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
+  motor_ang_vel[1][0] = encoderReaderAngVel(m2Raw, m2RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
+
+
+  //Calculate robot linear and angular velocity
+  Matrix.Multiply((mtx_type*)inv_Kin, (mtx_type*)motor_ang_vel, 2, 2, 1, (mtx_type*)vel_Matrix);
+
+
   // Speed Controller
-  ref_SC          = SPEED_REFERENCE;
+  ref_SC          = SPEED_REF;
   act_SC          = vel_Matrix[0][0];
   error_SC        = ref_SC - act_SC;
   SC_cont_out     = error_SC * K_SC;
@@ -72,35 +65,19 @@ void motors() {
   act_IL          = pitch_rate;
   error_IL        = ref_IL - act_IL;
   iError_IL       = iError_IL + (error_IL * dT_s * I_IL);
-  Speed_CMD       = round((error_IL * K_IL) + iError_IL);
-
-  M1_Speed_CMD    = Speed_CMD;
-  M2_Speed_CMD    = Speed_CMD;
-
-  //  M1_Speed_CMD    = 500;
-  //  M2_Speed_CMD    = 500;
-
-  //Calculate speed from encoders
-  M1_Lin_Vel          = encoderReaderLinVel(m1Raw, m1RawLast, M1_Lin_Vel, PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
-  M2_Lin_Vel          = encoderReaderLinVel(m2Raw, m2RawLast, M2_Lin_Vel, PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
-  M1_Ang_Vel          = encoderReaderAngVel(m1Raw, m1RawLast, M1_Ang_Vel, PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
-  M2_Ang_Vel          = encoderReaderAngVel(m2Raw, m2RawLast, M2_Ang_Vel, PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
-
-  motor_ang_vel[0][0] = M1_Ang_Vel;
-  motor_ang_vel[1][0] = M2_Ang_Vel;
+  IL_cont_out     = round((error_IL * K_IL) + iError_IL);
 
 
-  //void MatrixMath::Multiply(mtx_type* A, mtx_type* B, int m, int p, int n, mtx_type* C)
-  //{
-  // A = input matrix (m x p)
-  // B = input matrix (p x n)
-  // m = number of rows in A
-  // p = number of columns in A = number of rows in B
-  // n = number of columns in B
-  // C = output matrix = A*B (m x n)
+  //Turn controller
+  ref_TC          = TURN_SPEED_REF;
+  act_TC          = vel_Matrix[0][1];
+  error_TC        = ref_TC - act_TC;
+  TC_cont_out     = error_TC * K_TC;
 
 
-  Matrix.Multiply((mtx_type*)inv_Kin, (mtx_type*)motor_ang_vel, 2, 2, 1, (mtx_type*)vel_Matrix);
+  //Sum speed command for motors
+  M1_Speed_CMD    = IL_cont_out - TC_cont_out;
+  M2_Speed_CMD    = IL_cont_out + TC_cont_out;
 
 
   //Motor control
@@ -119,17 +96,17 @@ void motors() {
   //  Serial.println(Speed_CMD * (100.0 / 4096.0));
 
 
-  Serial.print("M1_Ang_Vel:");
-  Serial.print(M1_Ang_Vel);
-  Serial.print(" ");
-  Serial.print("M2_Ang_Vel:");
-  Serial.print(M2_Ang_Vel);
-  Serial.print(" ");
-  Serial.print("botLinVel:");
-  Serial.print(vel_Matrix[0][0]);
-  Serial.print(" ");
-  Serial.print("botAngVel:");
-  Serial.println(vel_Matrix[1][0]);
+  //  Serial.print("M1_Ang_Vel:");
+  //  Serial.print(M1_Ang_Vel);
+  //  Serial.print(" ");
+  //  Serial.print("M2_Ang_Vel:");
+  //  Serial.print(M2_Ang_Vel);
+  //  Serial.print(" ");
+  //  Serial.print("botLinVel:");
+  //  Serial.print(vel_Matrix[0][0]);
+  //  Serial.print(" ");
+  //  Serial.print("botAngVel:");
+  //  Serial.println(vel_Matrix[1][0]);
 
 
   //Update variables for next scan cycle
