@@ -40,12 +40,6 @@ volatile bool   M1_A_state, M1_B_state;
 volatile bool   M2_A_state, M2_B_state;
 
 
-//Matrices
-mtx_type      motor_ang_vel   [2][1];
-mtx_type      vel_Matrix      [2][1];
-mtx_type      inv_Kin         [2][2];
-
-
 void setup() {
   //Initialize serial
   Serial.begin(57600);
@@ -71,6 +65,7 @@ void setup() {
   m2Raw = 0;
   m2RawLast = 100;
 
+
   // Initialize PWM channels
   ledcAttachPin(M1_A, 1);
   ledcAttachPin(M1_B, 2);
@@ -82,8 +77,13 @@ void setup() {
   ledcSetup(3, PWM_CYCLE, PWM_RESOLUTION);
   ledcSetup(4, PWM_CYCLE, PWM_RESOLUTION);
 
+
   //Initialize differential drive inverse kinematics
   initMotors();
+
+
+  // Initialize Remote control
+  initRemote();
 
 }
 
@@ -98,6 +98,10 @@ void loop() {
   readIMU();
 
 
+  //Get remote control data
+  readRemote();
+
+
   //Control motors
   motors();
 
@@ -105,8 +109,9 @@ void loop() {
   //Save time for next cycle
   tLast = tNow;
 
-  //Plot
-  // plot();
+
+  // Plot
+  plot();
 
 
   //Delay

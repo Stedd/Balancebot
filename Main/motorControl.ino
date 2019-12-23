@@ -14,7 +14,7 @@ const float   DEADBAND_M2_NEG   = 90.0;
 
 //Tuning
 const float   K_SC              = 20.0;
-const float   K_TC              = 50.0;
+const float   K_TC              = 100.0;
 const float   K_OL              = 13.0;
 const float   K_IL              = 85.0;
 const float   I_IL              = 5.25;
@@ -23,10 +23,17 @@ const float   filter_gain       = 16.0;
 
 //Help variables
 int           M1_Speed_CMD, M2_Speed_CMD;
+float         rem_speed_ref, rem_turn_speed_ref;
 float         ref_SC, act_SC, error_SC, SC_cont_out;
 float         ref_TC, act_TC, error_TC, TC_cont_out;
 float         ref_OL, act_OL, error_OL, OL_cont_out;
 float         ref_IL, act_IL, error_IL, IL_cont_out, iError_IL;
+
+
+//Matrices
+mtx_type      motor_ang_vel   [2][1];
+mtx_type      vel_Matrix      [2][1];
+mtx_type      inv_Kin         [2][2];
 
 
 void initMotors() {
@@ -48,8 +55,13 @@ void motors() {
   Matrix.Multiply((mtx_type*)inv_Kin, (mtx_type*)motor_ang_vel, 2, 2, 1, (mtx_type*)vel_Matrix);
 
 
+  // Remote control commands
+  rem_turn_speed_ref  = remoteCMD[0];
+  rem_speed_ref       = remoteCMD[1];
+
   // Speed Controller
-  ref_SC          = SPEED_REF;
+  // ref_SC          = SPEED_REF;
+  ref_SC          = rem_speed_ref;
   act_SC          = vel_Matrix[0][0];
   error_SC        = ref_SC - act_SC;
   SC_cont_out     = error_SC * K_SC;
@@ -70,7 +82,8 @@ void motors() {
 
 
   //Turn controller
-  ref_TC          = TURN_SPEED_REF;
+  // ref_TC          = TURN_SPEED_REF;
+  ref_TC          = rem_turn_speed_ref;
   act_TC          = vel_Matrix[0][1];
   error_TC        = ref_TC - act_TC;
   TC_cont_out     = error_TC * K_TC;
@@ -79,6 +92,10 @@ void motors() {
   //Sum speed command for motors
   M1_Speed_CMD    = IL_cont_out - TC_cont_out;
   M2_Speed_CMD    = IL_cont_out + TC_cont_out;
+
+  //Sum speed command for motors
+  // M1_Speed_CMD    = 0;
+  // M2_Speed_CMD    = 0;
 
 
   //Motor control
