@@ -46,110 +46,6 @@ mtx_type      vel_Matrix      [2][1];
 mtx_type      inv_Kin         [2][2];
 
 
-//Interrupt routines
-void IRAM_ATTR m1_A_changed() {
-  M1_A_state = digitalRead(M1_ENC_A);
-  M1_B_state = digitalRead(M1_ENC_B);
-
-  //Rising
-  if (M1_A_state == HIGH) {
-    if (M1_B_state == HIGH) {
-      m1Raw = m1Raw - 1;
-    }
-    else if (M1_B_state == LOW) {
-      m1Raw = m1Raw + 1;
-    }
-  }
-
-  //Falling
-  else if (M1_A_state == LOW) {
-    if (M1_B_state == HIGH) {
-      m1Raw = m1Raw + 1;
-    }
-    else if (M1_B_state == LOW) {
-      m1Raw = m1Raw - 1;
-    }
-  }
-}
-
-
-void IRAM_ATTR m1_B_changed() {
-  M1_A_state = digitalRead(M1_ENC_A);
-  M1_B_state = digitalRead(M1_ENC_B);
-
-  //Rising
-  if (M1_B_state == HIGH) {
-    if (M1_A_state == HIGH) {
-      m1Raw = m1Raw + 1;
-    }
-    else if (M1_A_state == LOW) {
-      m1Raw = m1Raw - 1;
-    }
-  }
-
-  //Falling
-  else if (M1_B_state == LOW) {
-    if (M1_A_state == HIGH) {
-      m1Raw = m1Raw - 1;
-    }
-    else if (M1_A_state == LOW) {
-      m1Raw = m1Raw + 1;
-    }
-  }
-}
-
-void IRAM_ATTR m2_A_changed() {
-  M2_A_state = digitalRead(M2_ENC_A);
-  M2_B_state = digitalRead(M2_ENC_B);
-
-  //Rising
-  if (M2_A_state == HIGH) {
-    if (M2_B_state == HIGH) {
-      m2Raw = m2Raw + 1;
-    }
-    else if (M2_B_state == LOW) {
-      m2Raw = m2Raw - 1;
-    }
-  }
-
-  //Falling
-  else if (M2_A_state == LOW) {
-    if (M2_B_state == HIGH) {
-      m2Raw = m2Raw - 1;
-    }
-    else if (M2_B_state == LOW) {
-      m2Raw = m2Raw + 1;
-    }
-  }
-}
-
-
-void IRAM_ATTR m2_B_changed() {
-  M2_A_state = digitalRead(M2_ENC_A);
-  M2_B_state = digitalRead(M2_ENC_B);
-
-  //Rising
-  if (M2_B_state == HIGH) {
-    if (M2_A_state == HIGH) {
-      m2Raw = m2Raw - 1;
-    }
-    else if (M2_A_state == LOW) {
-      m2Raw = m2Raw + 1;
-    }
-  }
-
-  //Falling
-  else if (M2_B_state == LOW) {
-    if (M2_A_state == HIGH) {
-      m2Raw = m2Raw + 1;
-    }
-    else if (M2_A_state == LOW) {
-      m2Raw = m2Raw - 1;
-    }
-  }
-}
-
-
 void setup() {
   //Initialize serial
   Serial.begin(57600);
@@ -166,14 +62,8 @@ void setup() {
   delay(10);
 
   //Initialize encoder interrupts
-  pinMode(M1_ENC_A, INPUT_PULLUP);
-  pinMode(M1_ENC_B, INPUT_PULLUP);
-  pinMode(M2_ENC_A, INPUT_PULLUP);
-  pinMode(M2_ENC_B, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(M1_ENC_A), m1_A_changed, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(M1_ENC_B), m1_B_changed, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(M2_ENC_A), m2_A_changed, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(M2_ENC_B), m2_B_changed, CHANGE);
+  initInterrupt();
+
 
   //Initialize encoders
   m1Raw = 0;
@@ -182,9 +72,6 @@ void setup() {
   m2RawLast = 100;
 
   // Initialize PWM channels
-  // channels 0-15, resolution 1-16 bits, freq limits depend on resolution
-  // ledcSetup(uint8_t channel, uint32_t freq, uint8_t resolution_bits);
-
   ledcAttachPin(M1_A, 1);
   ledcAttachPin(M1_B, 2);
   ledcAttachPin(M2_A, 3);
