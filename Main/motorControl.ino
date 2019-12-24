@@ -13,21 +13,22 @@ const float   DEADBAND_M2_NEG   = 90.0;
 
 
 //Tuning
-const float   K_SC              = 18.0;   //Speed controller gain
-const float   K_TC              = 130.0;  //Turn controller gain
-const float   K_OL              = 14.0;   //Outer loop balance controller gain
-const float   K_IL              = 85.0;   //Inner loop balance controller gain
-const float   I_IL              = 5.25;   //Inner loop balance controller Igain
+const float   K_SC              = 18.5;   //Speed controller gain
+const float   K_TC              = 90.0;  //Turn controller gain
+const float   K_OL              = 13.0;   //Outer loop balance controller gain
+const float   K_IL              = 72.0;   //Inner loop balance controller gain
+const float   I_IL              = 80.0;   //Inner loop balance controller Igain
 const float   filter_gain       = 16.0;   //Motor speed LPF gain
 
 
 //Help variables
 int           M1_Speed_CMD, M2_Speed_CMD;
 float         rem_speed_ref, rem_turn_speed_ref;
-float         ref_SC, act_SC, error_SC, SC_cont_out;
-float         ref_TC, act_TC, error_TC, TC_cont_out;
-float         ref_OL, act_OL, error_OL, OL_cont_out;
-float         ref_IL, act_IL, error_IL, IL_cont_out, iError_IL;
+float         SC_cont_out;
+float         TC_cont_out;
+float         OL_cont_out;
+float         ref_IL, act_IL, error_IL, IL_cont_out, iError_IL, IL_anti_windup;
+
 
 
 //Matrices
@@ -57,27 +58,33 @@ void motors() {
 
 
   // Remote control commands
-  rem_turn_speed_ref  = floatMap(pwm_time_ch1, 992.0, 2007.0, -3.5, 3.5);
-  rem_speed_ref       = floatMap(pwm_time_ch2, 982.0, 1997.0, -0.25, 0.25);
+  if (pwm_time_ch1 == 0 && pwm_time_ch2 == 0){
+    rem_turn_speed_ref  = 0;
+    rem_speed_ref       = 0;
+  }
+  else{
+    rem_turn_speed_ref  = floatMap(pwm_time_ch1, 992.0, 2015.0, -3.75, 3.75);
+    rem_speed_ref       = floatMap(pwm_time_ch2, 982.0, 2005.0, -0.35, 0.35);
+  }
 
 
   // Speed Controller
-  SC_cont_out         = PController(rem_speed_ref, vel_Matrix[0][0], K_SC);
+  SC_cont_out           = PController(rem_speed_ref, vel_Matrix[0][0], K_SC);
 
 
   // Balance controller
   // Outer loop
-  OL_cont_out         = PController((BALANCE_POINT - SC_cont_out), pitch, K_OL);
+  OL_cont_out           = PController((BALANCE_POINT - SC_cont_out), pitch, K_OL);
   // Inner loop
-  ref_IL              = OL_cont_out;
-  act_IL              = pitch_rate;
-  error_IL            = ref_IL - act_IL;
-  iError_IL           = iError_IL + (error_IL * dT_s * I_IL);
-  IL_cont_out         = round((error_IL * K_IL) + iError_IL);
+  ref_IL                = OL_cont_out;
+  act_IL                = pitch_rate;
+  error_IL              = ref_IL - act_IL;
+  iError_IL             = iError_IL + (dT_s*(error_IL * I_IL) + (IL_anti_windup*((1/I_IL)+(1/K_IL))));
+  IL_cont_out           = round((error_IL * K_IL) + iError_IL);
 
 
   //Turn controller
-  TC_cont_out         = PController(rem_turn_speed_ref, vel_Matrix[0][1], K_TC);
+  TC_cont_out           = PController(rem_turn_speed_ref, vel_Matrix[0][1], K_TC);
 
 
   //Sum speed command for motors
@@ -90,9 +97,9 @@ void motors() {
 
 
   //Motor control
-  motorControl(1, M1_Speed_CMD, MOTOR_SATURATION, DEADBAND_M1_POS, DEADBAND_M1_NEG);
-  motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
-
+  IL_anti_windup = motorControl(1, M1_Speed_CMD, MOTOR_SATURATION, DEADBAND_M1_POS, DEADBAND_M1_NEG);
+  IL_anti_windup = IL_anti_windup + motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
+  IL_anti_windup = IL_anti_windup/2;
 
   //Update variables for next scan cycle
   m1RawLast = m1Raw;
@@ -124,11 +131,12 @@ float encoderReaderAngVel(int encRaw, int encRawLast, float ang_vel_filtered_, f
   return          ang_vel_filtered_ + ((ang_vel_ - ang_vel_filtered_) * dT_ * filt_gain_);
 }
 
-void motorControl(byte motorID, int speedCMD_, int saturation, float dbPos_, float dbNeg_) {
+float motorControl(byte motorID, int speedCMD_, int saturation, float dbPos_, float dbNeg_) {
+  //Returns anti windup difference
   //Calculate channel
-  byte ch2 = motorID * 2;
-  byte ch1 = ch2 - 1;
-
+  byte ch2      = motorID * 2;
+  byte ch1      = ch2 - 1;
+  float windup  = 0;
   //Deadband
   if (speedCMD_ > 0 && speedCMD_ < dbPos_) {
     speedCMD_ = dbPos_;
@@ -139,9 +147,11 @@ void motorControl(byte motorID, int speedCMD_, int saturation, float dbPos_, flo
 
   // Speed command saturation
   else if (speedCMD_ > saturation) {
+    windup    = saturation-speedCMD_;
     speedCMD_ = saturation;
   }
   else if (speedCMD_ < -saturation) {
+    windup    = saturation-speedCMD_;
     speedCMD_ = -saturation;
   }
 
@@ -162,4 +172,7 @@ void motorControl(byte motorID, int speedCMD_, int saturation, float dbPos_, flo
     ledcWrite(ch1, 0);
     ledcWrite(ch2, 0);
   }
+
+  return windup;
+
 }

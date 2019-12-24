@@ -65,11 +65,6 @@ void setup() {
   m2RawLast = 100;
 
   // Initialize PWM channels
-  // byte pwmPins[4]  = {M1_A, M1_B, M2_A, M2_B};
-  // for(int i = 1; i >= 4; i++){
-  //   ledcAttachPin(pwmPins[i-1], i);
-  //   ledcSetup(i, PWM_CYCLE, PWM_RES);
-  // }
   ledcAttachPin(M1_A, 1);
   ledcAttachPin(M1_B, 2);
   ledcAttachPin(M2_A, 3);

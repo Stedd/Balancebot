@@ -24,10 +24,15 @@ void plot(){
 
   // Remote control
      // Serial.print("ch1:");
-     // Serial.print(remoteCMD[0]);
+     // Serial.print(pwm_time_ch1);
      // Serial.print(" ");
      // Serial.print("ch2:");
-     // Serial.println(remoteCMD[1]);
+     // Serial.print(pwm_time_ch2);
+     // Serial.print("ch1mapped:");
+     // Serial.print(rem_turn_speed_ref);
+     // Serial.print(" ");
+     // Serial.print("ch2mapped:");
+     // Serial.println(rem_speed_ref);
 
 
   // Encoders
@@ -38,15 +43,23 @@ void plot(){
      // Serial.println(m2Raw);
 
 // Motors
-  //  Serial plotter
-  //  Serial.print("Balance_Point:");
-  //  Serial.print(ref_OL);
-  //  Serial.print(" ");
-  //  Serial.print("Pitch_Angle:");
-  //  Serial.print(act_OL);
-  //  Serial.print(" ");
-  //  Serial.print("Speed_CMD:");
-  //  Serial.println(Speed_CMD * (100.0 / 4096.0));
+   // Serial.print("SpeedControllerOut:");
+   // Serial.print(SC_cont_out);
+   // Serial.print(" ");
+   // Serial.print("BalanceOLControllerOut:");
+   // Serial.print(OL_cont_out);
+   // Serial.print(" ");
+   // Serial.print("BalanceILControllerOut:");
+   // Serial.print(IL_cont_out);
+   // Serial.print(" ");
+   // Serial.print("TurnControllerOut:");
+   // Serial.println(TC_cont_out);
+   // Serial.print(" ");
+   // Serial.print("M1_CMD:");
+   // Serial.print(M1_Speed_CMD);
+   // Serial.print(" ");
+   // Serial.print("M2_CMD:");
+   // Serial.println(M2_Speed_CMD);
 
    // Serial.print("M1_Ang_Vel:");
    // Serial.print(motor_ang_vel[0][0]);
