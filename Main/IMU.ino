@@ -11,7 +11,6 @@ int           gx, gy, gz;
 float         gt;
 float         acc_pitch;
 float         pitch_rate;
-float         dAngle, estAngle;
 float         pitch               = 0;
 float         pitch_prev          = 0;
 
@@ -48,11 +47,10 @@ void readIMU() {
 
 
   //Complementary filter
-  dAngle      = pitch_rate * dT_s;
-  pitch       = acc_pitch * (1 - alpha) + ((dAngle + pitch_prev) * alpha);
+  pitch       = acc_pitch * (1 - alpha) + (((pitch_rate * dT_s) + pitch_prev) * alpha);
   pitch_prev  = pitch;
 
-  
+
 }
 
 

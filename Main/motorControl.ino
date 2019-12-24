@@ -1,5 +1,5 @@
 //Constants
-const int     MOTOR_SATURATION  = round(pow(2, PWM_RESOLUTION));
+const int     MOTOR_SATURATION  = round(pow(2, PWM_RES));
 const float   BASE_WIDTH        = 0.1837;
 const float   WHEEL_DIAMETER    = 0.0677;
 const float   PULSES_PER_TURN   = 1320.0;
@@ -13,12 +13,12 @@ const float   DEADBAND_M2_NEG   = 90.0;
 
 
 //Tuning
-const float   K_SC              = 20.0;
-const float   K_TC              = 100.0;
-const float   K_OL              = 13.0;
-const float   K_IL              = 85.0;
-const float   I_IL              = 5.25;
-const float   filter_gain       = 16.0;
+const float   K_SC              = 18.0;   //Speed controller gain
+const float   K_TC              = 130.0;  //Turn controller gain
+const float   K_OL              = 14.0;   //Outer loop balance controller gain
+const float   K_IL              = 85.0;   //Inner loop balance controller gain
+const float   I_IL              = 5.25;   //Inner loop balance controller Igain
+const float   filter_gain       = 16.0;   //Motor speed LPF gain
 
 
 //Help variables
@@ -37,10 +37,11 @@ mtx_type      inv_Kin         [2][2];
 
 
 void initMotors() {
-  inv_Kin[0][0] = WHEEL_DIAMETER / 4;
-  inv_Kin[1][0] = (WHEEL_DIAMETER / 2) / BASE_WIDTH;
-  inv_Kin[0][1] = WHEEL_DIAMETER / 4;
-  inv_Kin[1][1] = -(WHEEL_DIAMETER / 2) / BASE_WIDTH;
+  // Inverse Kinematic matrix of differential drive robot
+  inv_Kin[0][0]       = WHEEL_DIAMETER / 4;
+  inv_Kin[1][0]       = (WHEEL_DIAMETER / 2) / BASE_WIDTH;
+  inv_Kin[0][1]       = WHEEL_DIAMETER / 4;
+  inv_Kin[1][1]       = -(WHEEL_DIAMETER / 2) / BASE_WIDTH;
 }
 
 void motors() {
@@ -56,42 +57,32 @@ void motors() {
 
 
   // Remote control commands
-  rem_turn_speed_ref  = remoteCMD[0];
-  rem_speed_ref       = remoteCMD[1];
+  rem_turn_speed_ref  = floatMap(pwm_time_ch1, 992.0, 2007.0, -3.5, 3.5);
+  rem_speed_ref       = floatMap(pwm_time_ch2, 982.0, 1997.0, -0.25, 0.25);
+
 
   // Speed Controller
-  // ref_SC          = SPEED_REF;
-  ref_SC          = rem_speed_ref;
-  act_SC          = vel_Matrix[0][0];
-  error_SC        = ref_SC - act_SC;
-  SC_cont_out     = error_SC * K_SC;
+  SC_cont_out         = PController(rem_speed_ref, vel_Matrix[0][0], K_SC);
 
 
   // Balance controller
   // Outer loop
-  ref_OL          = BALANCE_POINT - SC_cont_out;
-  act_OL          = pitch;
-  error_OL        = ref_OL - act_OL;
-  OL_cont_out     = error_OL * K_OL;
+  OL_cont_out         = PController((BALANCE_POINT - SC_cont_out), pitch, K_OL);
   // Inner loop
-  ref_IL          = OL_cont_out;
-  act_IL          = pitch_rate;
-  error_IL        = ref_IL - act_IL;
-  iError_IL       = iError_IL + (error_IL * dT_s * I_IL);
-  IL_cont_out     = round((error_IL * K_IL) + iError_IL);
+  ref_IL              = OL_cont_out;
+  act_IL              = pitch_rate;
+  error_IL            = ref_IL - act_IL;
+  iError_IL           = iError_IL + (error_IL * dT_s * I_IL);
+  IL_cont_out         = round((error_IL * K_IL) + iError_IL);
 
 
   //Turn controller
-  // ref_TC          = TURN_SPEED_REF;
-  ref_TC          = rem_turn_speed_ref;
-  act_TC          = vel_Matrix[0][1];
-  error_TC        = ref_TC - act_TC;
-  TC_cont_out     = error_TC * K_TC;
+  TC_cont_out         = PController(rem_turn_speed_ref, vel_Matrix[0][1], K_TC);
 
 
   //Sum speed command for motors
-  M1_Speed_CMD    = IL_cont_out - TC_cont_out;
-  M2_Speed_CMD    = IL_cont_out + TC_cont_out;
+  M1_Speed_CMD        = IL_cont_out - TC_cont_out;
+  M2_Speed_CMD        = IL_cont_out + TC_cont_out;
 
   //Sum speed command for motors
   // M1_Speed_CMD    = 0;
@@ -108,6 +99,15 @@ void motors() {
   m2RawLast = m2Raw;
 
 
+}
+
+float PController(float ref_, float act_, float k_){
+  return (ref_-act_)*k_;
+}
+
+
+float floatMap(int in, float inMin, float inMax, float outMin, float outMax){
+  return (in - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
 
 float encoderReaderLinVel(int encRaw, int encRawLast, float lin_vel_filtered_, float pulses_per_turn_, float wheel_diameter_, float dT_, float filt_gain_ ) {

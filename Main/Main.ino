@@ -29,8 +29,8 @@ float         dT_s          = 0.0;
 
 
 //Motor variables
-const int   PWM_CYCLE       = 12000;
-const byte  PWM_RESOLUTION  = 12;
+const int     PWM_CYCLE     = 12000;
+const byte    PWM_RES       = 12;
 
 
 //Encoders variables
@@ -58,29 +58,30 @@ void setup() {
   //Initialize encoder interrupts
   initInterrupt();
 
-
   //Initialize encoders
   m1Raw = 0;
   m1RawLast = 100;
   m2Raw = 0;
   m2RawLast = 100;
 
-
   // Initialize PWM channels
+  // byte pwmPins[4]  = {M1_A, M1_B, M2_A, M2_B};
+  // for(int i = 1; i >= 4; i++){
+  //   ledcAttachPin(pwmPins[i-1], i);
+  //   ledcSetup(i, PWM_CYCLE, PWM_RES);
+  // }
   ledcAttachPin(M1_A, 1);
   ledcAttachPin(M1_B, 2);
   ledcAttachPin(M2_A, 3);
   ledcAttachPin(M2_B, 4);
 
-  ledcSetup(1, PWM_CYCLE, PWM_RESOLUTION);
-  ledcSetup(2, PWM_CYCLE, PWM_RESOLUTION);
-  ledcSetup(3, PWM_CYCLE, PWM_RESOLUTION);
-  ledcSetup(4, PWM_CYCLE, PWM_RESOLUTION);
-
+  ledcSetup(1, PWM_CYCLE, PWM_RES);
+  ledcSetup(2, PWM_CYCLE, PWM_RES);
+  ledcSetup(3, PWM_CYCLE, PWM_RES);
+  ledcSetup(4, PWM_CYCLE, PWM_RES);
 
   //Initialize differential drive inverse kinematics
   initMotors();
-
 
   // Initialize Remote control
   initRemote();
@@ -98,22 +99,18 @@ void loop() {
   readIMU();
 
 
-  //Get remote control data
-  readRemote();
-
-
   //Control motors
   motors();
-
-
-  //Save time for next cycle
-  tLast = tNow;
 
 
   // Plot
   plot();
 
 
+  //Save time for next cycle
+  tLast = tNow;
+
+
   //Delay
-  delay(5);             // only read every 0,5 seconds, 10ms for 100Hz, 20ms for 50Hz
+  delay(5);
 }
