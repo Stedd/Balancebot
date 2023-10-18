@@ -28,7 +28,7 @@ float SC_cont_out;
 float TC_cont_out;
 float OL_cont_out;
 float ref_IL, act_IL, error_IL, IL_cont_out, iError_IL, IL_anti_windup;
-
+float speedCmd1, speedCmd2;
 
 
 //Matrices
@@ -84,14 +84,18 @@ void motors() {
   M2_Speed_CMD = IL_cont_out + TC_cont_out;
 
   //Sum speed command for motors
-  M1_Speed_CMD = 0;
-  M2_Speed_CMD = 0;
+  speedCmd1 = floatMap(Ps3.data.analog.stick.ry, -128.0, 127.0, -1.0, 1.0);
+  M1_Speed_CMD = MOTOR_SATURATION * speedCmd1;
+  motorControl(1, M1_Speed_CMD, MOTOR_SATURATION, DEADBAND_M1_POS, DEADBAND_M1_NEG);
 
+  speedCmd2 = floatMap(Ps3.data.analog.stick.ly, -128.0, 127.0, -1.0, 1.0);
+  M2_Speed_CMD = MOTOR_SATURATION * speedCmd2;
+  motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
 
   //Motor control
-  IL_anti_windup = motorControl(1, M1_Speed_CMD, MOTOR_SATURATION, DEADBAND_M1_POS, DEADBAND_M1_NEG);
-  IL_anti_windup = IL_anti_windup + motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
-  IL_anti_windup = IL_anti_windup / 2;
+  // IL_anti_windup = motorControl(1, M1_Speed_CMD, MOTOR_SATURATION, DEADBAND_M1_POS, DEADBAND_M1_NEG);
+  // IL_anti_windup = IL_anti_windup + motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
+  // IL_anti_windup = IL_anti_windup / 2;
 
   //Update variables for next scan cycle
   m1RawLast = m1Raw;

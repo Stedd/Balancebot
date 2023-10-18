@@ -7,7 +7,7 @@ const int gyro_overflow_value = 4558;  // 4096+512-50=4558 ?
 //IMU VARIABLES
 int ax, ay, az;
 int cx, cy, cz;
-int gx, gy, gz;
+float gx, gy, gz;
 float gt;
 float acc_pitch;
 float pitch_rate;
@@ -16,26 +16,30 @@ float pitch_prev = 0;
 
 
 void readIMU() {
+  // Serial.println("ReadingIMU");
   //Acceletometer
-  ax = convertInt(IMU.accelerometer_x(IMU.readFromAccelerometer()), acc_overflow_value);
-  ay = convertInt(IMU.accelerometer_y(IMU.readFromAccelerometer()), acc_overflow_value);
-  az = convertInt(IMU.accelerometer_z(IMU.readFromAccelerometer()), acc_overflow_value);
+  int* accelerometerReadings = IMU.readFromAccelerometer();
+  ax = convertInt(IMU.accelerometer_x(accelerometerReadings), acc_overflow_value);
+  ay = convertInt(IMU.accelerometer_y(accelerometerReadings), acc_overflow_value);
+  az = convertInt(IMU.accelerometer_z(accelerometerReadings), acc_overflow_value);
 
 
   //Magnetometer
-  cx = IMU.compass_x(IMU.readFromCompass());
-  cy = IMU.compass_y(IMU.readFromCompass());
-  cz = IMU.compass_z(IMU.readFromCompass());
+  int* compassReadings = IMU.readFromCompass();
+  cx = IMU.compass_x(compassReadings);
+  cy = IMU.compass_y(compassReadings);
+  cz = IMU.compass_z(compassReadings);
 
 
   //  Gyrocope
-  gx = convertInt(IMU.gyro_x(IMU.readGyro()), gyro_overflow_value);  //  gx -  Pitch rate
-  gy = convertInt(IMU.gyro_y(IMU.readGyro()), gyro_overflow_value);  //  gy -  Roll rate
-  gz = convertInt(IMU.gyro_z(IMU.readGyro()), gyro_overflow_value);  //  gz -  Yaw rate
+  float* gyroReadings = IMU.readGyro();
+  gx = convertInt(IMU.gyro_x(gyroReadings), gyro_overflow_value);  //  gx -  Pitch rate
+  gy = convertInt(IMU.gyro_y(gyroReadings), gyro_overflow_value);  //  gy -  Roll rate
+  gz = convertInt(IMU.gyro_z(gyroReadings), gyro_overflow_value);  //  gz -  Yaw rate
 
 
   //Temperature sensor
-  gt = IMU.temp(IMU.readGyro());
+  gt = IMU.temp(gyroReadings);
 
 
   // Pitch angle from accelerometer

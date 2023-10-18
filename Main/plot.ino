@@ -9,7 +9,7 @@ void plot() {
 
   // IMU
   // Serial.print  ( "Pitch:" );
-  // Serial.print  ( pitch );
+  // Serial.println  ( pitch );
   // Serial.print  (" ");
   // Serial.print  ( "Accelerometer_Pitch:" );
   // Serial.print  ( acc_pitch );
@@ -52,11 +52,14 @@ void plot() {
   // Serial.print("BalanceILControllerOut:");
   // Serial.print(IL_cont_out);
   // Serial.print(" ");
-  // Serial.print("TurnControllerOut:");
-  // Serial.println(TC_cont_out);
+  // Serial.print("SpeedCmd1:");
+  // Serial.println(speedCmd1);
   // Serial.print(" ");
   // Serial.print("M1_CMD:");
   // Serial.print(M1_Speed_CMD);
+  // Serial.print(" ");
+  // Serial.print("SpeedCmd2:");
+  // Serial.println(speedCmd2);
   // Serial.print(" ");
   // Serial.print("M2_CMD:");
   // Serial.println(M2_Speed_CMD);

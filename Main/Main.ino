@@ -49,11 +49,14 @@ void setup() {
   delay(10);
 
   //Initialice I2C
-  Wire.begin(IMU_I2C_SCL, IMU_I2C_SDA);
-  delay(10);
+  //Wire.begin(IMU_I2C_SCL, IMU_I2C_SDA);
+  //delay(10);
 
   //Initialize IMU
-  IMU.init();
+  Serial.println("Before IMU init");
+  IMU.init(IMU_I2C_SCL, IMU_I2C_SDA);
+  //IMU.init();
+  Serial.println("After IMU init");
   delay(10);
 
   //Initialize encoder interrupts
@@ -84,6 +87,7 @@ void setup() {
 }
 
 void loop() {
+  // Serial.println("Loop");
   //Update time variables
   tNow = micros();
   dT = tNow - tLast;        //[Cycle time in microseconds]
@@ -91,7 +95,7 @@ void loop() {
 
 
   //Get sensor data
-  readIMU();
+  //readIMU();
 
 
   //Control motors
@@ -99,7 +103,7 @@ void loop() {
 
 
   // Plot
-  //plot();
+  plot();
 
 
   //Save time for next cycle
