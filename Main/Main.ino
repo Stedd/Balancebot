@@ -2,7 +2,8 @@
 #include <GY_85.h>
 #include <Wire.h>
 #include <MatrixMath.h>
-
+#include <Math.h>
+#include <Ps3Controller.h>
 
 //Declare library objects
 GY_85         IMU;
@@ -39,6 +40,8 @@ long int        m2Raw, m2RawLast;
 volatile bool   M1_A_state, M1_B_state;
 volatile bool   M2_A_state, M2_B_state;
 
+//PS3 Controller variables
+const char* _ps3Address = "18:5e:0f:92:00:6c";
 
 void setup() {
   //Initialize serial
@@ -78,8 +81,8 @@ void setup() {
   //Initialize differential drive inverse kinematics
   initMotors();
 
-  // Initialize Remote control
-  initRemote();
+  //Initialize PS3 controller connection
+  Ps3.begin(_ps3Address);
 
 }
 

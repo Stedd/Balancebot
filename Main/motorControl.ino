@@ -56,17 +56,9 @@ void motors() {
   //Calculate robot linear and angular velocity
   Matrix.Multiply((mtx_type*)inv_Kin, (mtx_type*)motor_ang_vel, 2, 2, 1, (mtx_type*)vel_Matrix);
 
-
-  // Remote control commands
-  if (pwm_time_ch1 == 0 && pwm_time_ch2 == 0){
-    rem_turn_speed_ref  = 0;
-    rem_speed_ref       = 0;
-  }
-  else{
-    rem_turn_speed_ref  = floatMap(pwm_time_ch1, 992.0, 2015.0, -3.75, 3.75);
-    rem_speed_ref       = floatMap(pwm_time_ch2, 982.0, 2005.0, -0.35, 0.35);
-  }
-
+  //Get Control Commands
+  rem_turn_speed_ref    = floatMap(Ps3.data.analog.stick.ly, -128.0, 127.0, -3.75, 3.75);
+  rem_speed_ref         = floatMap(Ps3.data.analog.stick.ry, -128.0, 127.0, -0.35, 0.35);
 
   // Speed Controller
   SC_cont_out           = PController(rem_speed_ref, vel_Matrix[0][0], K_SC);

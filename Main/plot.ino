@@ -72,4 +72,19 @@ void plot(){
    // Serial.print(" ");
    // Serial.print("botAngVel:");
    // Serial.println(vel_Matrix[1][0]);
+
+  //    //PS3 Controller
+  // if (Ps3.isConnected()) {
+  //   Serial.print("lx:");
+  //   Serial.print(Ps3.data.analog.stick.lx);
+  //   Serial.print(",");
+  //   Serial.print("ly:");
+  //   Serial.print(Ps3.data.analog.stick.ly);
+  //   Serial.print(",");
+  //   Serial.print("rx:");
+  //   Serial.print(Ps3.data.analog.stick.rx);
+  //   Serial.print(",");
+  //   Serial.print("ry:");
+  //   Serial.println(Ps3.data.analog.stick.ry);
+  // }
 }
