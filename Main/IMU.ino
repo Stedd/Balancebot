@@ -31,15 +31,15 @@ void readIMU() {
   cz = IMU.compass_z(compassReadings);
 
 
-  //  Gyrocope
-  float* gyroReadings = IMU.readGyro();
-  gx = convertInt(IMU.gyro_x(gyroReadings), gyro_overflow_value);  //  gx -  Pitch rate
-  gy = convertInt(IMU.gyro_y(gyroReadings), gyro_overflow_value);  //  gy -  Roll rate
-  gz = convertInt(IMU.gyro_z(gyroReadings), gyro_overflow_value);  //  gz -  Yaw rate
+  // //  Gyrocope
+  // float* gyroReadings = IMU.readGyro();
+  // gx = convertInt(IMU.gyro_x(gyroReadings), gyro_overflow_value);  //  gx -  Pitch rate
+  // gy = convertInt(IMU.gyro_y(gyroReadings), gyro_overflow_value);  //  gy -  Roll rate
+  // gz = convertInt(IMU.gyro_z(gyroReadings), gyro_overflow_value);  //  gz -  Yaw rate
 
 
-  //Temperature sensor
-  gt = IMU.temp(gyroReadings);
+  // //Temperature sensor
+  // gt = IMU.temp(gyroReadings);
 
 
   // Pitch angle from accelerometer

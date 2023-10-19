@@ -18,8 +18,8 @@ const byte M1_A = 16;
 const byte M1_B = 17;
 const byte M2_A = 18;
 const byte M2_B = 19;
-const byte IMU_I2C_SCL = 26;
-const byte IMU_I2C_SDA = 27;
+const int IMU_I2C_SCL = 26;
+const int IMU_I2C_SDA = 27;
 
 
 //Time variables
@@ -49,12 +49,12 @@ void setup() {
   delay(10);
 
   //Initialice I2C
-  //Wire.begin(IMU_I2C_SCL, IMU_I2C_SDA);
+  Wire.setPins(IMU_I2C_SCL, IMU_I2C_SDA);
   //delay(10);
 
   //Initialize IMU
   Serial.println("Before IMU init");
-  IMU.init(IMU_I2C_SCL, IMU_I2C_SDA);
+  IMU.init();
   //IMU.init();
   Serial.println("After IMU init");
   delay(10);
@@ -95,7 +95,7 @@ void loop() {
 
 
   //Get sensor data
-  //readIMU();
+  readIMU();
 
 
   //Control motors

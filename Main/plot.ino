@@ -8,8 +8,8 @@ void plot() {
   // Serial.print(" ");
 
   // IMU
-  // Serial.print  ( "Pitch:" );
-  // Serial.println  ( pitch );
+  Serial.print  ( "Pitch:" );
+  Serial.println  ( pitch );
   // Serial.print  (" ");
   // Serial.print  ( "Accelerometer_Pitch:" );
   // Serial.print  ( acc_pitch );
