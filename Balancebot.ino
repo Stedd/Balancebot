@@ -45,7 +45,7 @@ const char* _ps3Address = "18:5e:0f:92:00:6c";
 
 void setup() {
   //Initialize serial
-  Serial.begin(19200);
+  Serial.begin(9600);
   delay(10);
 
   //Initialice I2C

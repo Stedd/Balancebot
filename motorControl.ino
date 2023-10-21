@@ -13,13 +13,13 @@ const float DEADBAND_M2_NEG = 90.0;
 
 
 //Tuning
-const float K_SC = 18.5;         //Speed controller gain
-const float K_TC = 90.0;         //Turn controller gain
-const float K_OL = 13.0;         //Outer loop balance controller gain
-const float K_IL = 72.0;         //Inner loop balance controller gain
-const float I_IL = 80.0;         //Inner loop balance controller Igain
+const float gainScale = 0.75;
+const float K_SC = 18.5*gainScale;         //Speed controller gain
+const float K_TC = 90.0*gainScale;         //Turn controller gain
+const float K_OL = 13.0*gainScale;         //Outer loop balance controller gain
+const float K_IL = 72.0*gainScale;         //Inner loop balance controller gain
+const float I_IL = 80.0*gainScale;         //Inner loop balance controller Igain
 const float filter_gain = 16.0;  //Motor speed LPF gain
-
 
 //Help variables
 int M1_Speed_CMD, M2_Speed_CMD;
@@ -30,7 +30,7 @@ float OL_cont_out;
 float ref_IL, act_IL, error_IL, IL_cont_out, iError_IL, IL_anti_windup;
 float speedCmd1, speedCmd2;
 
-bool balancingOn = false;
+bool balancingOn = true;
 
 //Matrices
 mtx_type motor_ang_vel[2][1];
@@ -59,6 +59,10 @@ void motors() {
 
   if (Ps3.data.button.triangle) {
     ResetIntegrators();
+  }
+
+  if (Ps3.data.button.square) {
+      IMU.init();
   }
 
   if (balancingOn) {
@@ -92,6 +96,7 @@ void motors() {
 
     //Turn controller
     TC_cont_out = PController(rem_turn_speed_ref, vel_Matrix[0][1], K_TC);
+
     //Sum speed command for motors
     M1_Speed_CMD = IL_cont_out - TC_cont_out;
     M2_Speed_CMD = IL_cont_out + TC_cont_out;
@@ -172,6 +177,7 @@ float motorControl(byte motorID, int speedCMD_, int saturation, float dbPos_, fl
   else {
     speedCMD_ = speedCMD_;
   }
+
 
   //Apply speed command to PWM output
   if (speedCMD_ > 0) {
