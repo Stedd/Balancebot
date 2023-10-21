@@ -45,18 +45,19 @@ const char* _ps3Address = "18:5e:0f:92:00:6c";
 
 void setup() {
   //Initialize serial
-  Serial.begin(57600);
+  Serial.begin(19200);
   delay(10);
 
   //Initialice I2C
   Wire.begin(IMU_I2C_SDA, IMU_I2C_SCL);
-  //delay(10);
+  delay(10);
+
 
   //Initialize IMU
   Serial.println("Before IMU init");
   IMU.init();
-  //IMU.init();
   Serial.println("After IMU init");
+
   delay(10);
 
   //Initialize encoder interrupts

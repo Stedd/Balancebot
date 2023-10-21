@@ -30,6 +30,7 @@ float OL_cont_out;
 float ref_IL, act_IL, error_IL, IL_cont_out, iError_IL, IL_anti_windup;
 float speedCmd1, speedCmd2;
 
+bool balancingOn = false;
 
 //Matrices
 mtx_type motor_ang_vel[2][1];
@@ -47,59 +48,80 @@ void initMotors() {
 
 void motors() {
 
+  if (Ps3.data.button.cross) {
+    ResetIntegrators();
+    balancingOn = true;
+  }
 
-  //Calculate wheel angular velocity
-  motor_ang_vel[0][0] = encoderReaderAngVel(m1Raw, m1RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
-  motor_ang_vel[1][0] = encoderReaderAngVel(m2Raw, m2RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
+  if (Ps3.data.button.circle) {
+    balancingOn = false;
+  }
 
+  if (Ps3.data.button.triangle) {
+    ResetIntegrators();
+  }
 
-  //Calculate robot linear and angular velocity
-  Matrix.Multiply((mtx_type*)inv_Kin, (mtx_type*)motor_ang_vel, 2, 2, 1, (mtx_type*)vel_Matrix);
+  if (balancingOn) {
 
-  //Get Control Commands
-  rem_turn_speed_ref = floatMap(Ps3.data.analog.stick.ly, -128.0, 127.0, -3.75, 3.75);
-  rem_speed_ref = floatMap(Ps3.data.analog.stick.ry, -128.0, 127.0, -0.35, 0.35);
-
-  // Speed Controller
-  SC_cont_out = PController(rem_speed_ref, vel_Matrix[0][0], K_SC);
-
-
-  // Balance controller
-  // Outer loop
-  OL_cont_out = PController((BALANCE_POINT - SC_cont_out), pitch, K_OL);
-  // Inner loop
-  ref_IL = OL_cont_out;
-  act_IL = pitch_rate;
-  error_IL = ref_IL - act_IL;
-  iError_IL = iError_IL + (dT_s * (error_IL * I_IL) + (IL_anti_windup * ((1 / I_IL) + (1 / K_IL))));
-  IL_cont_out = round((error_IL * K_IL) + iError_IL);
+    //Calculate wheel angular velocity
+    motor_ang_vel[0][0] = encoderReaderAngVel(m1Raw, m1RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
+    motor_ang_vel[1][0] = encoderReaderAngVel(m2Raw, m2RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
 
 
-  //Turn controller
-  TC_cont_out = PController(rem_turn_speed_ref, vel_Matrix[1][0], K_TC);
+    //Calculate robot linear and angular velocity
+    Matrix.Multiply((mtx_type*)inv_Kin, (mtx_type*)motor_ang_vel, 2, 2, 1, (mtx_type*)vel_Matrix);
+
+    //Get Control Commands
+    rem_turn_speed_ref = floatMap(Ps3.data.analog.stick.ly, -128.0, 127.0, -3.75, 3.75);
+    rem_speed_ref = floatMap(Ps3.data.analog.stick.ry, -128.0, 127.0, -0.35, 0.35);
+
+    // Speed Controller
+    SC_cont_out = PController(rem_speed_ref, vel_Matrix[0][0], K_SC);
 
 
-  //Sum speed command for motors
-  M1_Speed_CMD = IL_cont_out - TC_cont_out;
-  M2_Speed_CMD = IL_cont_out + TC_cont_out;
+    // Balance controller
+    // Outer loop
+    OL_cont_out = PController((BALANCE_POINT - SC_cont_out), pitch, K_OL);
+    // Inner loop
+    ref_IL = OL_cont_out;
+    act_IL = pitch_rate;
+    error_IL = ref_IL - act_IL;
+    iError_IL = iError_IL + (dT_s * (error_IL * I_IL) + (IL_anti_windup * ((1 / I_IL) + (1 / K_IL))));
+    IL_cont_out = round((error_IL * K_IL) + iError_IL);
 
-  //Sum speed command for motors
-  speedCmd1 = floatMap(Ps3.data.analog.stick.ry, -128.0, 127.0, -1.0, 1.0);
-  M1_Speed_CMD = MOTOR_SATURATION * speedCmd1;
-  motorControl(1, M1_Speed_CMD, MOTOR_SATURATION, DEADBAND_M1_POS, DEADBAND_M1_NEG);
 
-  speedCmd2 = floatMap(Ps3.data.analog.stick.ly, -128.0, 127.0, -1.0, 1.0);
-  M2_Speed_CMD = MOTOR_SATURATION * speedCmd2;
-  motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
+    //Turn controller
+    TC_cont_out = PController(rem_turn_speed_ref, vel_Matrix[0][1], K_TC);
+    //Sum speed command for motors
+    M1_Speed_CMD = IL_cont_out - TC_cont_out;
+    M2_Speed_CMD = IL_cont_out + TC_cont_out;
 
-  //Motor control
-  // IL_anti_windup = motorControl(1, M1_Speed_CMD, MOTOR_SATURATION, DEADBAND_M1_POS, DEADBAND_M1_NEG);
-  // IL_anti_windup = IL_anti_windup + motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
-  // IL_anti_windup = IL_anti_windup / 2;
+    //Motor control
+    IL_anti_windup = motorControl(1, M1_Speed_CMD, MOTOR_SATURATION, DEADBAND_M1_POS, DEADBAND_M1_NEG);
+    IL_anti_windup = IL_anti_windup + motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
+    IL_anti_windup = IL_anti_windup / 2;
+
+  } else {
+
+    //Sum speed command for motors
+    speedCmd1 = floatMap(Ps3.data.analog.stick.ry, -128.0, 127.0, -1.0, 1.0);
+    M1_Speed_CMD = MOTOR_SATURATION * speedCmd1;
+    motorControl(1, M1_Speed_CMD, MOTOR_SATURATION, DEADBAND_M1_POS, DEADBAND_M1_NEG);
+
+    speedCmd2 = floatMap(Ps3.data.analog.stick.ly, -128.0, 127.0, -1.0, 1.0);
+    M2_Speed_CMD = MOTOR_SATURATION * speedCmd2;
+    motorControl(2, M2_Speed_CMD, MOTOR_SATURATION, DEADBAND_M2_POS, DEADBAND_M2_NEG);
+  }
+
 
   //Update variables for next scan cycle
   m1RawLast = m1Raw;
   m2RawLast = m2Raw;
+}
+
+void ResetIntegrators() {
+  iError_IL = 0.0;
+  IL_anti_windup = 0.0;
 }
 
 float PController(float ref_, float act_, float k_) {

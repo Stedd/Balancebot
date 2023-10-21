@@ -8,18 +8,20 @@ void plot() {
   // Serial.print(" ");
 
   // IMU
-  Serial.print  ( "Pitch:" );
-  Serial.println  ( pitch );
-  // Serial.print  (" ");
-  // Serial.print  ( "Accelerometer_Pitch:" );
-  // Serial.print  ( acc_pitch );
-  // Serial.print  (" ");
-  // Serial.print  ( "," );
-  // Serial.println  ( gz );
-  // Serial.print  ( "," );
-  // Serial.println  ( gt );
-  // Serial.print  ( " " );
-  // Serial.println  ( acc_pitch);
+  Serial.print("Pitch:");
+  Serial.println(pitch);
+
+  // Serial.print("Accelerometer_Pitch:");
+  // Serial.println(acc_pitch);
+
+  Serial.print("RollRate");
+  Serial.println(gz);
+
+  // Serial.print(",");
+  // Serial.println(gt);
+
+  // Serial.print(" ");
+  // Serial.println(acc_pitch);
 
 
   // Remote control
@@ -43,20 +45,23 @@ void plot() {
   // Serial.println(m2Raw);
 
   // Motors
-  // Serial.print("SpeedControllerOut:");
-  // Serial.print(SC_cont_out);
-  // Serial.print(" ");
-  // Serial.print("BalanceOLControllerOut:");
-  // Serial.print(OL_cont_out);
-  // Serial.print(" ");
-  // Serial.print("BalanceILControllerOut:");
-  // Serial.print(IL_cont_out);
-  // Serial.print(" ");
+  Serial.print("SpeedControllerOut:");
+  Serial.println(SC_cont_out);
+
+  Serial.print("BalanceOLControllerOut:");
+  Serial.println(OL_cont_out);
+
+  Serial.print("BalanceILControllerOut:");
+  Serial.println(IL_cont_out);
+
+  Serial.print("AntiWindup:");
+  Serial.println(IL_anti_windup);
+
   // Serial.print("SpeedCmd1:");
   // Serial.println(speedCmd1);
   // Serial.print(" ");
   // Serial.print("M1_CMD:");
-  // Serial.print(M1_Speed_CMD);
+  // Serial.println(M1_Speed_CMD);
   // Serial.print(" ");
   // Serial.print("SpeedCmd2:");
   // Serial.println(speedCmd2);
@@ -65,13 +70,13 @@ void plot() {
   // Serial.println(M2_Speed_CMD);
 
   // Serial.print("M1_Ang_Vel:");
-  // Serial.print(motor_ang_vel[0][0]);
+  // Serial.println(motor_ang_vel[0][0]);
   // Serial.print(" ");
   // Serial.print("M2_Ang_Vel:");
-  // Serial.print(motor_ang_vel[0][1]);
+  // Serial.println(motor_ang_vel[0][1]);
   // Serial.print(" ");
   // Serial.print("botLinVel:");
-  // Serial.print(vel_Matrix[0][0]);
+  // Serial.println(vel_Matrix[0][0]);
   // Serial.print(" ");
   // Serial.print("botAngVel:");
   // Serial.println(vel_Matrix[1][0]);
