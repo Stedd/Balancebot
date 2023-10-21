@@ -8,7 +8,6 @@ const IPAddress multicastIP = IPAddress(239, 1, 2, 3);
 int port = 1234;
 
 byte watchdog = 0;
-
 AsyncUDP udp;
 
 void UdpInit() {
@@ -18,8 +17,6 @@ void UdpInit() {
 }
 
 void UdpLoop() {
-  byte data[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
-  data[0] = watchdog++;
   udp.writeTo(data, sizeof(data), multicastIP, port);
 }
 

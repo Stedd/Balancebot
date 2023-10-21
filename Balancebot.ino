@@ -43,6 +43,9 @@ volatile bool M2_A_state, M2_B_state;
 //PS3 Controller variables
 const char* _ps3Address = "18:5e:0f:92:00:6c";
 
+//UDP variables
+uint8_t data[30 * 4];
+
 void setup() {
   //Initialize serial
   Serial.begin(9600);
@@ -104,7 +107,6 @@ void loop() {
 
   //Control motors
   motors();
-
 
   // Plot
   plot();

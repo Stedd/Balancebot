@@ -88,4 +88,53 @@ void plot() {
   //   Serial.print("ry:");
   //   Serial.println(Ps3.data.analog.stick.ry);
   // }
+
+  int i = 0;
+  data[i] = watchdog++;
+  data[i += 1] = balancingOn<<1;
+  i = PackInt(i+=1, M1_Speed_CMD);
+  i = PackInt(i, M2_Speed_CMD);
+  i = PackFloat(i, acc_pitch);
+  i = PackFloat(i, pitch);
+  i = PackFloat(i, pitch_rate);
+  i = PackFloat(i, rem_speed_ref);
+  i = PackFloat(i, rem_turn_speed_ref);
+  i = PackFloat(i, SC_cont_out);
+  i = PackFloat(i, TC_cont_out);
+  i = PackFloat(i, OL_cont_out);
+  i = PackFloat(i, ref_IL);
+  i = PackFloat(i, error_IL);
+  i = PackFloat(i, IL_cont_out);
+  i = PackFloat(i, iError_IL);
+  i = PackFloat(i, IL_anti_windup);
+  i = PackFloat(i, speedCmd1);
+  i = PackFloat(i, speedCmd2);
 }
+
+int PackInt(int _i, int value) {
+  data[_i] = (value & 0x00FF) ;
+  data[_i + 1] = (value & 0xFF00)>>8;  
+  return _i + 2;
+}
+
+union FloatToBytes {
+    float value;
+    byte bytes[4];
+};
+
+int PackFloat(int _i, float value) {
+    FloatToBytes converter;
+    converter.value = value;
+    for(int j = 0; j < 4; j++) {
+        data[_i + j] = converter.bytes[j];
+    }
+    return _i + 4;
+}
+
+// int PackFloat(int _i, float value) {
+//   data[_i] = (value & 0x000000FF) ;
+//   data[_i + 2] = (value & 0x0000FF00)>>8;
+//   data[_i + 3] = (value & 0x00FF0000)>>16;
+//   data[_i + 4] = (value & 0xFF000000)>>24;
+//   return _i + 4;
+// }
