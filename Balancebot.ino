@@ -85,6 +85,9 @@ void setup() {
 
   //Initialize PS3 controller connection
   Ps3.begin(_ps3Address);
+
+  //Init UDP
+  UdpInit();
 }
 
 void loop() {
@@ -106,13 +109,12 @@ void loop() {
   // Plot
   plot();
 
+  //Udp
+  UdpLoop();
 
   //Save time for next cycle
   tLast = tNow;
 
-
   //Delay
   delay(5);
-
-  //Test
 }

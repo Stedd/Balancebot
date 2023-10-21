@@ -30,7 +30,7 @@ float OL_cont_out;
 float ref_IL, act_IL, error_IL, IL_cont_out, iError_IL, IL_anti_windup;
 float speedCmd1, speedCmd2;
 
-bool balancingOn = true;
+bool balancingOn = false;
 
 //Matrices
 mtx_type motor_ang_vel[2][1];
