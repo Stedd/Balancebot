@@ -18,8 +18,8 @@ const byte M1_A = 16;
 const byte M1_B = 17;
 const byte M2_A = 18;
 const byte M2_B = 19;
-const int IMU_I2C_SCL = 26;
-const int IMU_I2C_SDA = 27;
+const int IMU_I2C_SDA = 26;
+const int IMU_I2C_SCL = 27;
 
 
 //Time variables
@@ -49,7 +49,7 @@ void setup() {
   delay(10);
 
   //Initialice I2C
-  Wire.setPins(IMU_I2C_SCL, IMU_I2C_SDA);
+  Wire.begin(IMU_I2C_SDA, IMU_I2C_SCL);
   //delay(10);
 
   //Initialize IMU
