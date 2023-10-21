@@ -76,7 +76,7 @@ void motors() {
 
 
   //Turn controller
-  TC_cont_out = PController(rem_turn_speed_ref, vel_Matrix[0][1], K_TC);
+  TC_cont_out = PController(rem_turn_speed_ref, vel_Matrix[1][0], K_TC);
 
 
   //Sum speed command for motors
