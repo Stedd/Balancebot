@@ -91,8 +91,8 @@ void plot() {
 
   int i = 0;
   data[i] = watchdog++;
-  data[i += 1] = balancingOn<<1;
-  i = PackInt(i+=1, M1_Speed_CMD);
+  data[i += 1] = balancingOn << 1;
+  i = PackInt(i += 1, M1_Speed_CMD);
   i = PackInt(i, M2_Speed_CMD);
   i = PackFloat(i, acc_pitch);
   i = PackFloat(i, pitch);
@@ -103,12 +103,19 @@ void plot() {
   i = PackFloat(i, TC_cont_out);
   i = PackFloat(i, OL_cont_out);
   i = PackFloat(i, ref_IL);
+  i = PackFloat(i, act_IL);
   i = PackFloat(i, error_IL);
   i = PackFloat(i, IL_cont_out);
   i = PackFloat(i, iError_IL);
   i = PackFloat(i, IL_anti_windup);
   i = PackFloat(i, speedCmd1);
   i = PackFloat(i, speedCmd2);
+  i = PackFloat(i, vel_Matrix[0][0]);
+  i = PackFloat(i, vel_Matrix[1][0]);
+  i = PackFloat(i, motor_ang_vel[0][0]);
+  i = PackFloat(i, motor_ang_vel[1][0]);
+  i = PackLong(i, m1Raw);
+  i = PackLong(i, m2Raw);
 }
 
 int PackInt(int _i, int value) {
