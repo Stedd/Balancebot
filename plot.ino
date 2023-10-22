@@ -8,13 +8,10 @@ void SerialPlot() {
   // Serial.print(" ");
 
   // IMU
-
   // Serial.print("RollRate:");
   // Serial.println(pitch_rate);
-
   // Serial.print("Accelerometer_Pitch:");
   // Serial.println(acc_pitch);
-
   // Serial.print("Pitch:");
   // Serial.println(pitch);
   // Serial.print  ( "," );
@@ -39,29 +36,21 @@ void SerialPlot() {
   // Encoders
   // Serial.print("m1Raw:");
   // Serial.println(m1Raw);
-
   // Serial.print("m2Raw:");
   // Serial.println(m2Raw);
-
   // // Motors
   // Serial.print("SpeedControllerOut:");
   // Serial.println(SC_cont_out);
-
   // Serial.print("BalanceOLControllerOut:");
   // Serial.println(OL_cont_out);
-
   // Serial.print("BalanceILControllerOut:");
   // Serial.println(IL_cont_out);
-
   // Serial.print("TurnControllerOut:");
   // Serial.println(TC_cont_out);
-
   // Serial.print("M1_CMD:");
   // Serial.println(M1_Speed_CMD);
-
   // Serial.print("M2_CMD:");
   // Serial.println(M2_Speed_CMD);
-
   // Serial.print("M1_Ang_Vel:");
   // Serial.print(motor_ang_vel[0][0]);
   // Serial.print(" ");
@@ -89,13 +78,3 @@ void SerialPlot() {
   //   Serial.println(Ps3.data.analog.stick.ry);
   // }
 }
-
-
-
-// int PackFloat(int _i, float value) {
-//   data[_i] = (value & 0x000000FF) ;
-//   data[_i + 2] = (value & 0x0000FF00)>>8;
-//   data[_i + 3] = (value & 0x00FF0000)>>16;
-//   data[_i + 4] = (value & 0xFF000000)>>24;
-//   return _i + 4;
-// }
