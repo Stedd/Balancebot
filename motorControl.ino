@@ -169,7 +169,7 @@ float motorControl(byte motorID, int speedCMD_, int saturation, float dbPos_, fl
     windup = saturation - speedCMD_;
     speedCMD_ = saturation;
   } else if (speedCMD_ < -saturation) {
-    windup = saturation - speedCMD_;
+    windup = -saturation - speedCMD_;
     speedCMD_ = -saturation;
   }
 
