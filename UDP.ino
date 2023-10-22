@@ -30,7 +30,6 @@ void ConnectToWiFi() {
 }
 
 void PackUdpData() {
-
   int i = 0;
   data[i] = watchdog++;
   data[i += 1] = balancingOn << 1;
