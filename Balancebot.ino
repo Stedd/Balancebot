@@ -3,6 +3,7 @@
 #include <Wire.h>
 #include <MatrixMath.h>
 #include <Ps3Controller.h>
+#include "arduino_secrets.h"
 
 //Declare library objects
 GY_85 IMU;

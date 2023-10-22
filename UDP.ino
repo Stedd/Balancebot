@@ -1,5 +1,5 @@
-const char* ssid = "CaveBot";
-const char* password = "&nHM%D2!$]Qg[VUv";
+const char* ssid = SECRET_SSID;
+const char* password = SECRET_PASSWORD;
 
 #include "WiFi.h"
 #include "AsyncUDP.h"
