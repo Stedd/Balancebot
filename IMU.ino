@@ -1,20 +1,3 @@
-//CONSTANTS
-const float alpha = 0.95;
-const int acc_overflow_value = 65535;
-const int gyro_overflow_value = 4558;  // 4096+512-50=4558 ?
-
-
-//IMU VARIABLES
-int ax, ay, az;
-int cx, cy, cz;
-int gx, gy, gz;
-float gt;
-float acc_pitch;
-float pitch_rate;
-float pitch = 0;
-float pitch_prev = 0;
-
-
 void readIMU() {
   //Acceletometer
   ax = convertInt(IMU.accelerometer_x(IMU.readFromAccelerometer()), acc_overflow_value);

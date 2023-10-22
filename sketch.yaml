@@ -1,0 +1,13 @@
+profiles:
+  Esp32BalanceBot:
+    fqbn: arduino:esp32:esp32:firebeetle32
+    platforms:
+      - platform: arduino:esp32 (1.0.4)
+        platform_index_url: https://dl.espressif.com/dl/package_esp32_index.json
+    libraries:
+      - GY85 (1.0)
+      - Wire (1.0.1)
+      - MatrixMath (1.0)
+      - PS3 Controller Host (1.1.0)
+      - WiFi (1.0)
+      - ESP32 Async UDP (1.0.0)
