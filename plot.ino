@@ -1,4 +1,4 @@
-void plot() {
+void SerialPlot() {
   // Time
   // Serial.print("dT:");
   // Serial.println(dT);

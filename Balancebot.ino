@@ -107,7 +107,7 @@ void loop() {
   motors();
 
   // Plot
-  plot();
+  SerialPlot();
 
   //Udp
   UdpLoop();
