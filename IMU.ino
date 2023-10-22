@@ -26,7 +26,7 @@ void readIMU() {
 
 
   //Pitch rate from gyroscope
-  pitch_rate = -gx;
+  pitch_rate = -gy;
 
 
   //Complementary filter
