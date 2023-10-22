@@ -68,7 +68,7 @@ void motors() {
   if (balancingOn) {
 
     //Calculate wheel angular velocity
-    motor_ang_vel[0][0] = encoderReaderAngVel(m1Raw, m1RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
+    motor_ang_vel[0][0] = encoderReaderAngVel(m1Raw, m1RawLast, motor_ang_vel[0][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
     motor_ang_vel[1][0] = encoderReaderAngVel(m2Raw, m2RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
 
 
