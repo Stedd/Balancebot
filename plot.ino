@@ -119,24 +119,34 @@ void plot() {
 }
 
 int PackInt(int _i, int value) {
-  data[_i] = (value & 0x00FF) ;
-  data[_i + 1] = (value & 0xFF00)>>8;  
+  data[_i] = (value & 0x00FF);
+  data[_i + 1] = (value & 0xFF00) >> 8;
   return _i + 2;
 }
 
+int PackLong(int _i, long value) {
+  data[_i] = (value & 0x000000FF);
+  data[_i + 1] = (value & 0x0000FF00) >> 8;
+  data[_i + 2] = (value & 0x00FF0000) >> 16;
+  data[_i + 3] = (value & 0xFF000000) >> 24;
+  return _i + 4;
+}
+
 union FloatToBytes {
-    float value;
-    byte bytes[4];
+  float value;
+  byte bytes[4];
 };
 
 int PackFloat(int _i, float value) {
-    FloatToBytes converter;
-    converter.value = value;
-    for(int j = 0; j < 4; j++) {
-        data[_i + j] = converter.bytes[j];
-    }
-    return _i + 4;
+  FloatToBytes converter;
+  converter.value = value;
+  for (int j = 0; j < 4; j++) {
+    data[_i + j] = converter.bytes[j];
+  }
+  return _i + 4;
 }
+
+
 
 // int PackFloat(int _i, float value) {
 //   data[_i] = (value & 0x000000FF) ;

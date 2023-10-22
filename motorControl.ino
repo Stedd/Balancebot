@@ -13,13 +13,13 @@ const float DEADBAND_M2_NEG = 90.0;
 
 
 //Tuning
-const float K_SC = 18.5*gainScale;         //Speed controller gain
-const float K_TC = 90.0*gainScale;         //Turn controller gain
-const float K_OL = 13.0*gainScale;         //Outer loop balance controller gain
-const float K_IL = 72.0*gainScale;         //Inner loop balance controller gain
-const float I_IL = 80.0*gainScale;         //Inner loop balance controller Igain
-const float filter_gain = 16.0;  //Motor speed LPF gain
 const float gainScale = 1;
+const float K_SC = 18.5 * gainScale;  //Speed controller gain
+const float K_TC = 90.0 * gainScale;  //Turn controller gain
+const float K_OL = 13.0 * gainScale;  //Outer loop balance controller gain
+const float K_IL = 72.0 * gainScale;  //Inner loop balance controller gain
+const float I_IL = 80.0 * gainScale;  //Inner loop balance controller Igain
+const float filter_gain = 16.0;       //Motor speed LPF gain
 
 //Help variables
 int M1_Speed_CMD, M2_Speed_CMD;
@@ -62,7 +62,7 @@ void motors() {
   }
 
   if (Ps3.data.button.square) {
-      IMU.init();
+    IMU.init();
   }
 
 
@@ -81,7 +81,6 @@ void motors() {
 
     // Speed Controller
     SC_cont_out = PController(rem_speed_ref, vel_Matrix[0][0], K_SC);
-
 
     // Balance controller
     // Outer loop
