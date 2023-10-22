@@ -65,16 +65,16 @@ void motors() {
     IMU.init();
   }
 
+  //Calculate wheel angular velocity
+  motor_ang_vel[0][0] = encoderReaderAngVel(m1Raw, m1RawLast, motor_ang_vel[0][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
+  motor_ang_vel[1][0] = encoderReaderAngVel(m2Raw, m2RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
 
-    //Calculate wheel angular velocity
-    motor_ang_vel[0][0] = encoderReaderAngVel(m1Raw, m1RawLast, motor_ang_vel[0][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
-    motor_ang_vel[1][0] = encoderReaderAngVel(m2Raw, m2RawLast, motor_ang_vel[1][0], PULSES_PER_TURN, WHEEL_DIAMETER, dT_s, filter_gain);
   //Calculate robot linear and angular velocity
   Matrix.Multiply((mtx_type*)inv_Kin, (mtx_type*)motor_ang_vel, 2, 2, 1, (mtx_type*)vel_Matrix);
 
   //Get Control Commands
-  rem_turn_speed_ref = floatMap(Ps3.data.analog.stick.ly, -128.0, 127.0, -3.75, 3.75);
   rem_speed_ref = floatMap(Ps3.data.analog.stick.ry, -128.0, 127.0, -0.35, 0.35);
+  rem_turn_speed_ref = floatMap(Ps3.data.analog.stick.lx, -128.0, 127.0, -3.75, 3.75);
 
   if (balancingOn) {
 
@@ -157,6 +157,7 @@ float motorControl(byte motorID, int speedCMD_, int saturation, float dbPos_, fl
   byte ch2 = motorID * 2;
   byte ch1 = ch2 - 1;
   float windup = 0;
+
   //Deadband
   if (speedCMD_ > 0 && speedCMD_ < dbPos_) {
     speedCMD_ = dbPos_;
@@ -171,12 +172,9 @@ float motorControl(byte motorID, int speedCMD_, int saturation, float dbPos_, fl
   } else if (speedCMD_ < -saturation) {
     windup = -saturation - speedCMD_;
     speedCMD_ = -saturation;
-  }
-
-  else {
+  } else {
     speedCMD_ = speedCMD_;
   }
-
 
   //Apply speed command to PWM output
   if (speedCMD_ > 0) {

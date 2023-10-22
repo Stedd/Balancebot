@@ -11,15 +11,12 @@ byte watchdog = 0;
 AsyncUDP udp;
 
 void UdpInit() {
-  //Serial.begin(115200);
   ConnectToWiFi();
-  //udp.connect(multicastIP, port);
 }
 
 void UdpLoop() {
   udp.writeTo(data, sizeof(data), multicastIP, port);
 }
-
 
 void ConnectToWiFi() {
   WiFi.mode(WIFI_STA);

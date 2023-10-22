@@ -2,7 +2,6 @@
 #include <GY_85.h>
 #include <Wire.h>
 #include <MatrixMath.h>
-#include <Math.h>
 #include <Ps3Controller.h>
 
 //Declare library objects
@@ -40,13 +39,17 @@ long int m2Raw, m2RawLast;
 volatile bool M1_A_state, M1_B_state;
 volatile bool M2_A_state, M2_B_state;
 
+
 //PS3 Controller variables
 const char* _ps3Address = "18:5e:0f:92:00:6c";
+
 
 //UDP variables
 uint8_t data[30 * 4];
 
+
 void setup() {
+
   //Initialize serial
   Serial.begin(9600);
   delay(10);
@@ -55,12 +58,8 @@ void setup() {
   Wire.begin(IMU_I2C_SDA, IMU_I2C_SCL);
   delay(10);
 
-
   //Initialize IMU
-  Serial.println("Before IMU init");
   IMU.init();
-  Serial.println("After IMU init");
-
   delay(10);
 
   //Initialize encoder interrupts
@@ -94,16 +93,14 @@ void setup() {
 }
 
 void loop() {
-  // Serial.println("Loop");
+
   //Update time variables
   tNow = micros();
   dT = tNow - tLast;        //[Cycle time in microseconds]
   dT_s = dT * pow(10, -6);  //[Cycle time in seconds]
 
-
   //Get sensor data
   readIMU();
-
 
   //Control motors
   motors();

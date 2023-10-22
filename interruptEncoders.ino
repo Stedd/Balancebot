@@ -93,7 +93,6 @@ void IRAM_ATTR m2_B_changed() {
   }
 }
 
-
 void initEncoderInterrupt() {
   pinMode(M1_ENC_A, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(M1_ENC_A), m1_A_changed, CHANGE);
