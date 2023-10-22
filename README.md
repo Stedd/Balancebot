@@ -10,8 +10,11 @@ These settings allow upload:
 ## Dependencies
 ### Boards Manager
 [esp32 v1.0.4](https://github.com/espressif/arduino-esp32)
-#### Libraries
+#### Boards libraries
 - Wire @1.0.1
+- Wifi @1.0
+- ESP32 Async UDP @1.0.0
+
 ### Libraries
 [Ps3Controller.h @v1.1.0](https://github.com/jvpernis/esp32-ps3)
 
