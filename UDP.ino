@@ -15,6 +15,7 @@ void UdpInit() {
 }
 
 void UdpLoop() {
+  PackUdpData();
   udp.writeTo(data, sizeof(data), multicastIP, port);
 }
 
